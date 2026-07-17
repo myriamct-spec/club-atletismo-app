@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { listCompeticiones } from "../lib/competiciones";
 import type { Competicion } from "../types/database";
+import { mensajeError } from "../lib/errors";
 
 const ETIQUETAS_TIPO: Record<string, string> = {
   pista_aire_libre: "Pista al aire libre",
@@ -18,7 +19,7 @@ export default function Competiciones() {
   useEffect(() => {
     listCompeticiones()
       .then(setCompeticiones)
-      .catch((err) => setError(err instanceof Error ? err.message : "No se pudo cargar el listado."))
+      .catch((err) => setError(mensajeError(err, "No se pudo cargar el listado.")))
       .finally(() => setCargando(false));
   }, []);
 

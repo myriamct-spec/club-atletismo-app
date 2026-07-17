@@ -7,6 +7,7 @@ import { listComentariosPorAtleta, type ComentarioConEntrenador } from "../lib/c
 import { calcularCategoria, temporadaActual } from "../lib/categorias";
 import { Sparkline } from "../components/Sparkline";
 import type { Atleta, PruebaFisica, TipoPruebaFisica } from "../types/database";
+import { mensajeError } from "../lib/errors";
 
 const ETIQUETAS_TIPO_PRUEBA: Record<TipoPruebaFisica, string> = {
   fuerza: "Fuerza",
@@ -44,7 +45,7 @@ export default function InformeEvolucion() {
         setPruebas(p);
         setComentarios(c);
       })
-      .catch((err) => setError(err instanceof Error ? err.message : "No se pudo cargar el informe."))
+      .catch((err) => setError(mensajeError(err, "No se pudo cargar el informe.")))
       .finally(() => setCargando(false));
   }, [id]);
 

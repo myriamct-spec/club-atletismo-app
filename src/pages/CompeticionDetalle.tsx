@@ -5,6 +5,7 @@ import { createResultado, listResultadosPorCompeticion, deleteResultado, type Re
 import { listAtletas } from "../lib/atletas";
 import { listDisciplinas } from "../lib/disciplinas";
 import type { Atleta, Competicion, Disciplina } from "../types/database";
+import { mensajeError } from "../lib/errors";
 
 const ETIQUETAS_TIPO: Record<string, string> = {
   pista_aire_libre: "Pista al aire libre",
@@ -38,7 +39,7 @@ export default function CompeticionDetalle() {
       setAtletas(ats);
       setDisciplinas(discs);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "No se pudo cargar la competición.");
+      setError(mensajeError(err, "No se pudo cargar la competición."));
     } finally {
       setCargando(false);
     }
@@ -183,7 +184,7 @@ function FormularioResultado({
       });
       onGuardado();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "No se pudo guardar el resultado.");
+      setError(mensajeError(err, "No se pudo guardar el resultado."));
     } finally {
       setGuardando(false);
     }

@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { supabase } from "../lib/supabase";
 import { createAtleta, getAtleta, updateAtleta, type AtletaInput } from "../lib/atletas";
+import { mensajeError } from "../lib/errors";
 
 const CAMPOS_INICIALES: Omit<AtletaInput, "club_id"> = {
   nombre: "",
@@ -48,7 +49,7 @@ export default function AtletaForm() {
           activo: atleta.activo,
         });
       })
-      .catch((err) => setError(err instanceof Error ? err.message : "No se pudo cargar el atleta."))
+      .catch((err) => setError(mensajeError(err, "No se pudo cargar el atleta.")))
       .finally(() => setCargando(false));
   }, [id]);
 
@@ -85,7 +86,7 @@ export default function AtletaForm() {
         navigate(`/atletas/${creado.id}`);
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "No se pudo guardar el atleta.");
+      setError(mensajeError(err, "No se pudo guardar el atleta."));
     } finally {
       setGuardando(false);
     }

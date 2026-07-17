@@ -2,6 +2,7 @@ import { useRef, useState, type ChangeEvent } from "react";
 import { useAuth } from "../context/AuthContext";
 import { supabase } from "../lib/supabase";
 import { ClubLogo } from "../components/ClubLogo";
+import { mensajeError } from "../lib/errors";
 
 const TAMANO_MAXIMO_MB = 2;
 
@@ -51,7 +52,7 @@ export default function Ajustes() {
       await refreshClub();
       setOk(true);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "No se pudo subir el logo.");
+      setError(mensajeError(err, "No se pudo subir el logo."));
     } finally {
       setSubiendo(false);
       if (fileInputRef.current) fileInputRef.current.value = "";

@@ -7,6 +7,7 @@ import { asignarEntrenador, createAtleta, listAtletas } from "../lib/atletas";
 import { listEntrenadores } from "../lib/usuarios";
 import { normalizarClave, parseFechaExcel } from "../lib/excel";
 import type { Usuario } from "../types/database";
+import { mensajeError } from "../lib/errors";
 
 const CABECERAS = ["Nombre", "Apellidos", "Fecha_nacimiento", "Genero", "ID_Socio", "Entrenadores"];
 const CLAVE_A_CAMPO: Record<string, string> = {
@@ -133,7 +134,7 @@ export default function ImportarAtletas() {
 
       setFilas(procesadas);
     } catch (err) {
-      setErrorGeneral(err instanceof Error ? err.message : "No se pudo leer el archivo.");
+      setErrorGeneral(mensajeError(err, "No se pudo leer el archivo."));
     } finally {
       setProcesando(false);
     }

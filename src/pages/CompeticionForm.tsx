@@ -4,6 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import { createCompeticion } from "../lib/competiciones";
 import { temporadaActual } from "../lib/categorias";
 import type { TipoCompeticion } from "../types/database";
+import { mensajeError } from "../lib/errors";
 
 export default function CompeticionForm() {
   const { club } = useAuth();
@@ -34,7 +35,7 @@ export default function CompeticionForm() {
       });
       navigate(`/competiciones/${creada.id}`);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "No se pudo guardar la competición.");
+      setError(mensajeError(err, "No se pudo guardar la competición."));
     } finally {
       setGuardando(false);
     }

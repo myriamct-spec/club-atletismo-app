@@ -1,6 +1,7 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { useAuth } from "../context/AuthContext";
 import { createComentario, deleteComentario, listComentariosPorAtleta, type ComentarioConEntrenador } from "../lib/comentarios";
+import { mensajeError } from "../lib/errors";
 
 const CATEGORIAS = ["Técnico", "Actitudinal", "Médico", "Otro"];
 
@@ -102,7 +103,7 @@ function FormularioComentario({
       setTexto("");
       onGuardado();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "No se pudo guardar el comentario.");
+      setError(mensajeError(err, "No se pudo guardar el comentario."));
     } finally {
       setGuardando(false);
     }

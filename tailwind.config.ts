@@ -6,18 +6,18 @@ export default {
     extend: {
       colors: {
         navy: {
-          900: "#0A1B33",
-          800: "#123258",
-          600: "#1B4B8F",
+          900: "#14274E",
+          800: "#1E3E7E",
+          600: "#3566B0",
         },
         gold: {
-          500: "#D89A1F",
-          300: "#F2C94C",
+          500: "#F5B800",
+          300: "#FFDD55",
         },
-        ground: "#F7F4EC",
+        ground: "#F4F6F8",
       },
       fontFamily: {
-        display: ["'Arial Black'", "'Archivo Black'", "sans-serif"],
+        display: ["Impact", "Haettenschweiler", "'Arial Narrow Bold'", "'Archivo Black'", "sans-serif"],
       },
     },
   },

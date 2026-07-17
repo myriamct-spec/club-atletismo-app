@@ -9,11 +9,11 @@ export default defineConfig({
       registerType: "autoUpdate",
       includeAssets: ["favicon.svg"],
       manifest: {
-        name: "Club Atletismo Aurora",
-        short_name: "Aurora",
-        description: "Gestión deportiva del Club Atletismo Aurora",
-        theme_color: "#0A1B33",
-        background_color: "#0A1B33",
+        name: "Club Atletismo Veloz Runners",
+        short_name: "Veloz Runners",
+        description: "Gestión deportiva del Club Atletismo Veloz Runners",
+        theme_color: "#14274E",
+        background_color: "#14274E",
         display: "standalone",
         start_url: "/",
         icons: [

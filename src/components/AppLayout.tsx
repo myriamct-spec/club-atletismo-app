@@ -16,7 +16,9 @@ export function AppLayout() {
         <div className="flex items-center gap-3">
           <ClubLogo size={40} />
           <div className="leading-tight">
-            <p className="text-sm font-semibold">{club?.nombre ?? "Club Atletismo Aurora"}</p>
+            <p className="font-display text-sm tracking-wide text-white">
+              {club?.nombre ?? "Club Atletismo Veloz Runners"}
+            </p>
             <p className="text-xs text-navy-100/60">Panel del entrenador</p>
           </div>
         </div>

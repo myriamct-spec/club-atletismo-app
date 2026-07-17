@@ -10,4 +10,12 @@ body {
   .input {
     @apply w-full rounded-lg border border-navy-900/15 px-3 py-2 text-sm focus:border-navy-600 focus:outline-none focus:ring-2 focus:ring-navy-600/30;
   }
+
+  /* Eco del rótulo "VELOZ" del logo: condensado, itálico, inclinado. */
+  .accent-veloz {
+    @apply font-display italic text-gold-500;
+    letter-spacing: 0.01em;
+    transform: skewX(-6deg);
+    display: inline-block;
+  }
 }

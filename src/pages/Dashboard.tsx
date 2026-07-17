@@ -7,7 +7,7 @@ export default function Dashboard() {
     <div>
       <h1 className="text-2xl font-bold text-navy-900">Hola, {usuario?.nombre?.split(" ")[0]}</h1>
       <p className="mt-1 text-sm text-navy-800/70">
-        Panel del Club Atletismo Aurora.
+        Panel del Club Atletismo Veloz Runners.
       </p>
 
       <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-3">

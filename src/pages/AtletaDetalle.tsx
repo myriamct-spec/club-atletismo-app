@@ -11,6 +11,8 @@ import {
 } from "../lib/atletas";
 import { calcularCategoria, calcularEdad } from "../lib/categorias";
 import { listResultadosPorAtleta, type ResultadoConCompeticion } from "../lib/resultados";
+import { PruebasFisicasSeccion } from "../components/PruebasFisicasSeccion";
+import { ComentariosSeccion } from "../components/ComentariosSeccion";
 import type { Atleta, Usuario } from "../types/database";
 
 export default function AtletaDetalle() {
@@ -193,19 +195,10 @@ export default function AtletaDetalle() {
         )}
       </div>
 
-      <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <SeccionProximamente titulo="Pruebas físicas" />
-        <SeccionProximamente titulo="Comentarios del entrenador" />
+      <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2">
+        <PruebasFisicasSeccion atletaId={atleta.id} />
+        <ComentariosSeccion atletaId={atleta.id} />
       </div>
-    </div>
-  );
-}
-
-function SeccionProximamente({ titulo }: { titulo: string }) {
-  return (
-    <div className="rounded-2xl border border-dashed border-navy-900/20 bg-white p-5">
-      <p className="text-sm font-medium text-navy-900">{titulo}</p>
-      <p className="mt-1 text-xs text-navy-800/50">Próximamente</p>
     </div>
   );
 }

@@ -10,7 +10,7 @@ Gestión de atletas, resultados de competición, pruebas físicas y comentarios 
    ```
    npm install
    ```
-2. Crea un proyecto en [Supabase](https://supabase.com) y ejecuta la migración de `supabase/migrations/0001_init.sql` en el SQL editor del proyecto.
+2. Crea un proyecto en [Supabase](https://supabase.com) y ejecuta, en orden, las migraciones de `supabase/migrations/` en el SQL editor del proyecto.
 3. Copia `.env.example` a `.env` y rellena `VITE_SUPABASE_URL` y `VITE_SUPABASE_ANON_KEY` con los valores de tu proyecto.
 4. Crea al primer usuario administrador:
    - Da de alta el club en la tabla `clubs`.
@@ -27,7 +27,8 @@ Gestión de atletas, resultados de competición, pruebas físicas y comentarios 
 - [x] Esquema de base de datos y políticas de seguridad (RLS) en Supabase
 - [x] Login de entrenador/administrador
 - [x] Layout de la app con logo del club editable por el administrador (`/ajustes`)
-- [ ] Alta e importación de atletas desde Excel
+- [x] Alta, edición y ficha de atletas, con foto opcional y asignación de entrenadores (N:M)
+- [x] Importación de atletas desde Excel (plantilla, vista previa con errores, log de importación)
 - [ ] Alta manual e importación masiva de competiciones y resultados
 - [ ] Registro de pruebas físicas
 - [ ] Comentarios del entrenador
@@ -41,4 +42,5 @@ Ver `supabase/migrations/0001_init.sql`. Puntos clave acordados durante la fase 
 - `atletas.id_socio` sustituye al DNI como identificador único (no se almacenan datos de carácter especial).
 - `atletas.observaciones_generales` es una nota libre sin fecha en la ficha; el histórico fechado de valoraciones del entrenador vive en `comentarios` y es lo que alimenta el informe de evolución.
 - El logo del club (`clubs.logo_url`) se sube a Supabase Storage (`club-assets`) y es editable por el administrador desde `/ajustes`, sin necesidad de nuevo despliegue.
+- El alta de atletas (manual o por Excel) la hace el administrador, que también gestiona qué entrenadores tiene asignados cada atleta; un entrenador solo ve y edita los atletas que tiene asignados (`atleta_visible()` en RLS).
 - Alta de competiciones: formulario manual + importación masiva por Excel. Sin integración automática con RFEA/FAMU en el MVP (ver historial de prompts para el análisis de viabilidad).

@@ -164,8 +164,11 @@ create policy "usuarios_insert_admin" on usuarios for insert with check (auth_ro
 create policy "usuarios_update_admin" on usuarios for update using (auth_rol() = 'admin' and club_id = auth_club_id());
 create policy "usuarios_delete_admin" on usuarios for delete using (auth_rol() = 'admin' and club_id = auth_club_id());
 
+-- El alta la hace el admin (que también gestiona las asignaciones en entrenador_atleta):
+-- si un entrenador diera de alta un atleta sin tener aún una asignación, atleta_visible()
+-- le impediría verlo justo después de crearlo.
 create policy "atletas_select" on atletas for select using (atleta_visible(id));
-create policy "atletas_insert" on atletas for insert with check (club_id = auth_club_id());
+create policy "atletas_insert_admin" on atletas for insert with check (club_id = auth_club_id() and auth_rol() = 'admin');
 create policy "atletas_update" on atletas for update using (atleta_visible(id));
 create policy "atletas_delete_admin" on atletas for delete using (club_id = auth_club_id() and auth_rol() = 'admin');
 

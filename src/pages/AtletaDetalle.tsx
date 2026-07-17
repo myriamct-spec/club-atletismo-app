@@ -107,12 +107,20 @@ export default function AtletaDetalle() {
             {calcularCategoria(atleta.fecha_nacimiento)} · {calcularEdad(atleta.fecha_nacimiento)} años
             {atleta.id_socio && <> · Socio {atleta.id_socio}</>}
           </p>
-          <Link
-            to={`/atletas/${atleta.id}/editar`}
-            className="mt-3 inline-block rounded-lg border border-navy-900/20 px-3 py-1.5 text-xs font-semibold text-navy-900 hover:bg-white"
-          >
-            Editar ficha
-          </Link>
+          <div className="mt-3 flex gap-2">
+            <Link
+              to={`/atletas/${atleta.id}/editar`}
+              className="inline-block rounded-lg border border-navy-900/20 px-3 py-1.5 text-xs font-semibold text-navy-900 hover:bg-white"
+            >
+              Editar ficha
+            </Link>
+            <Link
+              to={`/atletas/${atleta.id}/informe`}
+              className="inline-block rounded-lg bg-navy-900 px-3 py-1.5 text-xs font-semibold text-gold-300 hover:bg-navy-800"
+            >
+              Ver informe de evolución
+            </Link>
+          </div>
         </div>
       </div>
 

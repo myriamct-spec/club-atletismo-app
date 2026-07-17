@@ -32,7 +32,7 @@ Gestión de atletas, resultados de competición, pruebas físicas y comentarios 
 - [x] Alta manual de competiciones, registro de resultados e importación masiva desde Excel
 - [x] Registro de pruebas físicas (tipo, valor, unidad, protocolo)
 - [x] Comentarios del entrenador (histórico fechado, por categoría)
-- [ ] Informe de evolución del atleta
+- [x] Informe de evolución del atleta (resultados + pruebas físicas + comentarios, por rango de fechas)
 
 ## Modelo de datos
 
@@ -46,3 +46,4 @@ Ver `supabase/migrations/0001_init.sql`. Puntos clave acordados durante la fase 
 - Alta de competiciones: formulario manual + importación masiva por Excel, en dos pasos (primero se crea la competición, luego se suben sus resultados). Sin integración automática con RFEA/FAMU en el MVP (ver historial de prompts para el análisis de viabilidad).
 - La importación de resultados prioriza `ID_Socio` para identificar al atleta; si no se indica, cruza por nombre y apellidos y marca error si es ambiguo o no lo encuentra (no se descarta la fila en silencio).
 - Pruebas físicas y comentarios quedan atribuidos a quien los registra: la política de alta exige `entrenador_id = auth.uid()` (`0003_autoria.sql`), no solo que el atleta sea visible para el usuario.
+- El informe de evolución (`/atletas/:id/informe`) no persiste nada: cruza en el cliente resultados, pruebas físicas y comentarios ya cargados, filtrados por rango de fechas (por defecto, la temporada en curso). Solo vista en pantalla en el MVP; exportar a PDF queda para una fase posterior.

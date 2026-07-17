@@ -7,6 +7,7 @@ import Dashboard from "./pages/Dashboard";
 import Atletas from "./pages/Atletas";
 import AtletaForm from "./pages/AtletaForm";
 import AtletaDetalle from "./pages/AtletaDetalle";
+import InformeEvolucion from "./pages/InformeEvolucion";
 import Competiciones from "./pages/Competiciones";
 import CompeticionForm from "./pages/CompeticionForm";
 import CompeticionDetalle from "./pages/CompeticionDetalle";
@@ -26,6 +27,7 @@ export default function App() {
           <Route path="/atletas" element={<Atletas />} />
           <Route path="/atletas/:id" element={<AtletaDetalle />} />
           <Route path="/atletas/:id/editar" element={<AtletaForm />} />
+          <Route path="/atletas/:id/informe" element={<InformeEvolucion />} />
 
           <Route path="/competiciones" element={<Competiciones />} />
           <Route path="/competiciones/nueva" element={<CompeticionForm />} />

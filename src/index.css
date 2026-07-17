@@ -1,0 +1,33 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Autoalojada: Impact/Arial Black no vienen instaladas en la mayoría de
+   sistemas (Linux, muchos Android) y el titular se veía fino en vez de
+   condensado/negrita. Anton (Google Fonts, OFL) da el mismo carácter sin
+   depender de fuentes del sistema. */
+@font-face {
+  font-family: "Anton";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/anton-latin.woff2") format("woff2");
+}
+
+body {
+  @apply bg-ground text-navy-900 antialiased;
+}
+
+@layer components {
+  .input {
+    @apply w-full rounded-lg border border-navy-900/15 px-3 py-2 text-sm focus:border-navy-600 focus:outline-none focus:ring-2 focus:ring-navy-600/30;
+  }
+
+  /* Eco del rótulo "VELOZ" del logo: condensado, itálico, inclinado. */
+  .accent-veloz {
+    @apply font-display italic text-gold-500;
+    letter-spacing: 0.01em;
+    transform: skewX(-6deg);
+    display: inline-block;
+  }
+}

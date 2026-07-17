@@ -4,7 +4,7 @@ import { supabase } from "../lib/supabase";
 import { ClubLogo } from "../components/ClubLogo";
 import { mensajeError } from "../lib/errors";
 
-const TAMANO_MAXIMO_MB = 2;
+const TAMANO_MAXIMO_MB = 8;
 
 export default function Ajustes() {
   const { club, refreshClub } = useAuth();

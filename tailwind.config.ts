@@ -17,7 +17,7 @@ export default {
         ground: "#F4F6F8",
       },
       fontFamily: {
-        display: ["Impact", "Haettenschweiler", "'Arial Narrow Bold'", "'Archivo Black'", "sans-serif"],
+        display: ["Anton", "Impact", "Haettenschweiler", "'Arial Narrow Bold'", "sans-serif"],
       },
     },
   },

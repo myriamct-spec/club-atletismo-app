@@ -2,6 +2,18 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Autoalojada: Impact/Arial Black no vienen instaladas en la mayoría de
+   sistemas (Linux, muchos Android) y el titular se veía fino en vez de
+   condensado/negrita. Anton (Google Fonts, OFL) da el mismo carácter sin
+   depender de fuentes del sistema. */
+@font-face {
+  font-family: "Anton";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/anton-latin.woff2") format("woff2");
+}
+
 body {
   @apply bg-ground text-navy-900 antialiased;
 }

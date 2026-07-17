@@ -28,6 +28,9 @@ export function AppLayout() {
           <NavLink to="/atletas" className={linkClasses}>
             Atletas
           </NavLink>
+          <NavLink to="/competiciones" className={linkClasses}>
+            Competiciones
+          </NavLink>
           {usuario?.rol === "admin" && (
             <NavLink to="/ajustes" className={linkClasses}>
               Ajustes del club

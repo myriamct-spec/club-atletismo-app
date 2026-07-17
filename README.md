@@ -29,7 +29,7 @@ Gestión de atletas, resultados de competición, pruebas físicas y comentarios 
 - [x] Layout de la app con logo del club editable por el administrador (`/ajustes`)
 - [x] Alta, edición y ficha de atletas, con foto opcional y asignación de entrenadores (N:M)
 - [x] Importación de atletas desde Excel (plantilla, vista previa con errores, log de importación)
-- [ ] Alta manual e importación masiva de competiciones y resultados
+- [x] Alta manual de competiciones, registro de resultados e importación masiva desde Excel
 - [ ] Registro de pruebas físicas
 - [ ] Comentarios del entrenador
 - [ ] Informe de evolución del atleta
@@ -43,4 +43,5 @@ Ver `supabase/migrations/0001_init.sql`. Puntos clave acordados durante la fase 
 - `atletas.observaciones_generales` es una nota libre sin fecha en la ficha; el histórico fechado de valoraciones del entrenador vive en `comentarios` y es lo que alimenta el informe de evolución.
 - El logo del club (`clubs.logo_url`) se sube a Supabase Storage (`club-assets`) y es editable por el administrador desde `/ajustes`, sin necesidad de nuevo despliegue.
 - El alta de atletas (manual o por Excel) la hace el administrador, que también gestiona qué entrenadores tiene asignados cada atleta; un entrenador solo ve y edita los atletas que tiene asignados (`atleta_visible()` en RLS).
-- Alta de competiciones: formulario manual + importación masiva por Excel. Sin integración automática con RFEA/FAMU en el MVP (ver historial de prompts para el análisis de viabilidad).
+- Alta de competiciones: formulario manual + importación masiva por Excel, en dos pasos (primero se crea la competición, luego se suben sus resultados). Sin integración automática con RFEA/FAMU en el MVP (ver historial de prompts para el análisis de viabilidad).
+- La importación de resultados prioriza `ID_Socio` para identificar al atleta; si no se indica, cruza por nombre y apellidos y marca error si es ambiguo o no lo encuentra (no se descarta la fila en silencio).

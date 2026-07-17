@@ -6,6 +6,7 @@ import {
   listPruebasFisicasPorAtleta,
 } from "../lib/pruebasFisicas";
 import type { PruebaFisica, TipoPruebaFisica } from "../types/database";
+import { mensajeError } from "../lib/errors";
 
 const ETIQUETAS_TIPO: Record<TipoPruebaFisica, string> = {
   fuerza: "Fuerza",
@@ -121,7 +122,7 @@ function FormularioPrueba({
       setProtocolo("");
       onGuardado();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "No se pudo guardar la prueba.");
+      setError(mensajeError(err, "No se pudo guardar la prueba."));
     } finally {
       setGuardando(false);
     }

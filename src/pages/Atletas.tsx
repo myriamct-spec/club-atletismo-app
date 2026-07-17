@@ -4,6 +4,7 @@ import { listAtletas } from "../lib/atletas";
 import { calcularCategoria } from "../lib/categorias";
 import { useAuth } from "../context/AuthContext";
 import type { Atleta } from "../types/database";
+import { mensajeError } from "../lib/errors";
 
 export default function Atletas() {
   const { usuario } = useAuth();
@@ -16,7 +17,7 @@ export default function Atletas() {
   useEffect(() => {
     listAtletas()
       .then(setAtletas)
-      .catch((err) => setError(err instanceof Error ? err.message : "No se pudo cargar el listado."))
+      .catch((err) => setError(mensajeError(err, "No se pudo cargar el listado.")))
       .finally(() => setCargando(false));
   }, []);
 

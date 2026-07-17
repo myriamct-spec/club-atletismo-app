@@ -9,6 +9,7 @@ import { listAtletas } from "../lib/atletas";
 import { listDisciplinas } from "../lib/disciplinas";
 import { normalizarClave } from "../lib/excel";
 import type { Atleta, Competicion, Disciplina } from "../types/database";
+import { mensajeError } from "../lib/errors";
 
 const CABECERAS = ["ID_Socio", "Nombre", "Apellidos", "Disciplina", "Marca", "Puesto", "Viento"];
 const CLAVE_A_CAMPO: Record<string, string> = {
@@ -147,7 +148,7 @@ export default function ImportarResultados() {
 
       setFilas(procesadas);
     } catch (err) {
-      setErrorGeneral(err instanceof Error ? err.message : "No se pudo leer el archivo.");
+      setErrorGeneral(mensajeError(err, "No se pudo leer el archivo."));
     } finally {
       setProcesando(false);
     }

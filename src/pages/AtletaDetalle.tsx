@@ -14,6 +14,7 @@ import { listResultadosPorAtleta, type ResultadoConCompeticion } from "../lib/re
 import { PruebasFisicasSeccion } from "../components/PruebasFisicasSeccion";
 import { ComentariosSeccion } from "../components/ComentariosSeccion";
 import type { Atleta, Usuario } from "../types/database";
+import { mensajeError } from "../lib/errors";
 
 export default function AtletaDetalle() {
   const { id } = useParams();
@@ -44,7 +45,7 @@ export default function AtletaDetalle() {
         setEntrenadoresClub(await listEntrenadores(club.id));
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "No se pudo cargar la ficha.");
+      setError(mensajeError(err, "No se pudo cargar la ficha."));
     } finally {
       setCargando(false);
     }

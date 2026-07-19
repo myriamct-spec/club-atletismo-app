@@ -62,6 +62,18 @@ begin
   end loop;
 end $$;
 
+-- Remapea grupos "por categoría de edad" ya creados con la nomenclatura
+-- tradicional a su equivalente sub-X. Tiene que ir antes de recrear los
+-- constraints de más abajo: si no, la validación del constraint nuevo se
+-- dispara contra filas que todavía tienen el nombre antiguo.
+update grupos set categoria = 'Sub-10' where categoria = 'Benjamín';
+update grupos set categoria = 'Sub-12' where categoria = 'Alevín';
+update grupos set categoria = 'Sub-14' where categoria = 'Infantil';
+update grupos set categoria = 'Sub-16' where categoria = 'Cadete';
+update grupos set categoria = 'Sub-18' where categoria = 'Juvenil';
+update grupos set categoria = 'Sub-20' where categoria = 'Junior';
+update grupos set categoria = 'Sub-23' where categoria = 'Promesa';
+
 alter table grupos add constraint grupos_categoria_check check (
   categoria is null or categoria in (
     'Psicomotricidad','Sub-8','Sub-10','Sub-12','Sub-14','Sub-16','Sub-18','Sub-20','Sub-23','Absoluta','Master'
@@ -71,13 +83,3 @@ alter table grupos add constraint grupos_tipo_categoria_check check (
   (tipo = 'categoria_edad' and categoria is not null) or
   (tipo = 'entrenamiento' and categoria is null)
 );
-
--- Remapea grupos "por categoría de edad" ya creados con la nomenclatura
--- tradicional a su equivalente sub-X.
-update grupos set categoria = 'Sub-10' where categoria = 'Benjamín';
-update grupos set categoria = 'Sub-12' where categoria = 'Alevín';
-update grupos set categoria = 'Sub-14' where categoria = 'Infantil';
-update grupos set categoria = 'Sub-16' where categoria = 'Cadete';
-update grupos set categoria = 'Sub-18' where categoria = 'Juvenil';
-update grupos set categoria = 'Sub-20' where categoria = 'Junior';
-update grupos set categoria = 'Sub-23' where categoria = 'Promesa';

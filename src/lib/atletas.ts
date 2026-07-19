@@ -1,5 +1,5 @@
 import { supabase } from "./supabase";
-import type { Atleta, EntrenadorAtleta, Usuario } from "../types/database";
+import type { Atleta } from "../types/database";
 
 export type AtletaInput = {
   club_id: string;
@@ -48,30 +48,3 @@ function mapAtletaError(error: { code?: string; message: string }): Error {
   return new Error(error.message);
 }
 
-export type AsignacionConEntrenador = EntrenadorAtleta & { entrenador: Usuario };
-
-export async function listEntrenadoresAsignados(atletaId: string): Promise<AsignacionConEntrenador[]> {
-  const { data, error } = await supabase
-    .from("entrenador_atleta")
-    .select("*, entrenador:usuarios(*)")
-    .eq("atleta_id", atletaId)
-    .eq("activo", true);
-
-  if (error) throw error;
-  return (data ?? []) as unknown as AsignacionConEntrenador[];
-}
-
-export async function asignarEntrenador(atletaId: string, entrenadorId: string): Promise<void> {
-  const { error } = await supabase
-    .from("entrenador_atleta")
-    .upsert(
-      { atleta_id: atletaId, entrenador_id: entrenadorId, activo: true },
-      { onConflict: "atleta_id,entrenador_id" },
-    );
-  if (error) throw error;
-}
-
-export async function quitarEntrenador(asignacionId: string): Promise<void> {
-  const { error } = await supabase.from("entrenador_atleta").update({ activo: false }).eq("id", asignacionId);
-  if (error) throw error;
-}

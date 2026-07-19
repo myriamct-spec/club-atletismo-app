@@ -11,6 +11,10 @@ const TRAMOS: Array<{ hasta: number; nombre: string }> = [
   { hasta: 22, nombre: "Promesa" },
 ];
 
+// Categorías asignables a un grupo "por edad": Absoluto queda fuera porque
+// esa categoría se organiza por grupo de entrenamiento, no por edad.
+export const CATEGORIAS_EDAD_ASIGNABLES = TRAMOS.map((t) => t.nombre);
+
 export function temporadaActual(): string {
   return String(new Date().getFullYear());
 }

@@ -30,6 +30,17 @@ export async function createGrupo(input: GrupoInput): Promise<Grupo> {
   return data as Grupo;
 }
 
+export async function updateGrupo(id: string, input: Omit<GrupoInput, "club_id">): Promise<Grupo> {
+  const { data, error } = await supabase.from("grupos").update(input).eq("id", id).select().single();
+  if (error) throw error;
+  return data as Grupo;
+}
+
+export async function deleteGrupo(id: string): Promise<void> {
+  const { error } = await supabase.from("grupos").delete().eq("id", id);
+  if (error) throw error;
+}
+
 export type AsignacionEntrenador = EntrenadorGrupo & { entrenador: Usuario };
 
 export async function listEntrenadoresDeGrupo(grupoId: string): Promise<AsignacionEntrenador[]> {

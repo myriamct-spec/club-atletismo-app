@@ -1,18 +1,27 @@
 import { supabase } from "./supabase";
-import type { Atleta, Competicion, Disciplina, Resultado } from "../types/database";
+import type { Atleta, Competicion, Disciplina, Intento, Parcial, Resultado, RitmoKm, TipoResultado, ValidezResultado } from "../types/database";
 
 export type ResultadoInput = {
   atleta_id: string;
-  competicion_id: string;
+  competicion_id?: string | null;
   disciplina_id: string;
   marca: string;
   puesto: number | null;
   viento: number | null;
   es_marca_personal: boolean;
   observaciones: string | null;
+  fecha?: string;
+  tipo?: TipoResultado;
+  validez?: ValidezResultado;
+  condiciones?: string | null;
+  intentos?: Intento[] | null;
+  parciales?: Parcial[] | null;
+  ritmo_por_km?: RitmoKm[] | null;
+  percepcion_esfuerzo?: number | null;
+  nota?: string | null;
 };
 
-export type ResultadoConCompeticion = Resultado & { competicion: Competicion; disciplina: Disciplina };
+export type ResultadoConCompeticion = Resultado & { competicion: Competicion | null; disciplina: Disciplina };
 export type ResultadoConAtleta = Resultado & { atleta: Atleta; disciplina: Disciplina };
 
 export async function listResultadosPorAtleta(atletaId: string): Promise<ResultadoConCompeticion[]> {
@@ -20,7 +29,7 @@ export async function listResultadosPorAtleta(atletaId: string): Promise<Resulta
     .from("resultados")
     .select("*, competicion:competiciones(*), disciplina:disciplinas(*)")
     .eq("atleta_id", atletaId)
-    .order("fecha", { ascending: false, referencedTable: "competiciones" });
+    .order("fecha", { ascending: false });
 
   if (error) throw error;
   return (data ?? []) as unknown as ResultadoConCompeticion[];

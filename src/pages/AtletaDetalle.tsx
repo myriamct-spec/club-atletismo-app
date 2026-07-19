@@ -139,7 +139,7 @@ export default function AtletaDetalle() {
       </div>
 
       <div className="mt-6 rounded-2xl border border-navy-900/10 bg-white p-5">
-        <p className="text-xs font-semibold uppercase tracking-wide text-navy-800/60">Resultados de competición</p>
+        <p className="text-xs font-semibold uppercase tracking-wide text-navy-800/60">Resultados</p>
         {resultados.length === 0 ? (
           <p className="mt-2 text-sm text-navy-800/60">Todavía no hay resultados registrados.</p>
         ) : (
@@ -147,13 +147,17 @@ export default function AtletaDetalle() {
             {resultados.map((r) => (
               <li key={r.id} className="flex items-center justify-between py-2 text-sm">
                 <div>
-                  <Link to={`/competiciones/${r.competicion.id}`} className="font-medium text-navy-900 hover:underline">
-                    {r.competicion.nombre}
-                  </Link>
+                  {r.competicion ? (
+                    <Link to={`/competiciones/${r.competicion.id}`} className="font-medium text-navy-900 hover:underline">
+                      {r.competicion.nombre}
+                    </Link>
+                  ) : (
+                    <span className="font-medium text-navy-900">Test de control</span>
+                  )}
                   <span className="text-navy-800/60"> · {r.disciplina.nombre}</span>
                 </div>
                 <div className="flex items-center gap-2 text-navy-800/70">
-                  {new Date(r.competicion.fecha).toLocaleDateString("es-ES")}
+                  {new Date(r.fecha).toLocaleDateString("es-ES")}
                   <span className="font-semibold text-navy-900">{r.marca}</span>
                   {r.es_marca_personal && (
                     <span className="rounded-full bg-gold-300/40 px-2 py-0.5 text-xs font-medium text-navy-900">PB</span>

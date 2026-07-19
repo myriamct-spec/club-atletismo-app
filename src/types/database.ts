@@ -3,6 +3,9 @@ export type UnidadMedida = "tiempo" | "distancia" | "altura" | "puntos";
 export type TipoCompeticion = "pista_aire_libre" | "pista_cubierta" | "campo_a_traves" | "ruta";
 export type OrigenCompeticion = "manual" | "importado";
 export type TipoPruebaFisica = "fuerza" | "velocidad" | "resistencia" | "flexibilidad" | "otra";
+export type FamiliaPrueba = "sprint" | "fondo" | "saltos" | "lanzamientos" | "otra";
+export type TipoResultado = "competicion" | "test_control";
+export type ValidezResultado = "valido" | "nulo" | "no_presentado";
 
 export interface Club {
   id: string;
@@ -60,6 +63,7 @@ export interface Disciplina {
   id: string;
   nombre: string;
   unidad_medida: UnidadMedida;
+  familia: FamiliaPrueba;
 }
 
 export interface Competicion {
@@ -73,16 +77,46 @@ export interface Competicion {
   origen: OrigenCompeticion;
 }
 
+// Intento suelto de una prueba de saltos/lanzamientos.
+export interface Intento {
+  numero: number;
+  valor: number;
+  validez: ValidezResultado;
+}
+
+// Parcial de una carrera de sprint (distancia acumulada -> tiempo acumulado).
+export interface Parcial {
+  distancia: number;
+  tiempo: number;
+}
+
+// Punto de ritmo/frecuencia cardíaca de una carrera de fondo, por km o vuelta.
+// ritmo_seg = segundos por km, para poder graficar y comparar sin parsear texto.
+export interface RitmoKm {
+  km: number;
+  ritmo_seg: number;
+  fc: number | null;
+}
+
 export interface Resultado {
   id: string;
   atleta_id: string;
-  competicion_id: string;
+  competicion_id: string | null;
   disciplina_id: string;
+  fecha: string;
+  tipo: TipoResultado;
   marca: string;
+  validez: ValidezResultado;
   puesto: number | null;
   viento: number | null;
   es_marca_personal: boolean;
   observaciones: string | null;
+  condiciones: string | null;
+  intentos: Intento[] | null;
+  parciales: Parcial[] | null;
+  ritmo_por_km: RitmoKm[] | null;
+  percepcion_esfuerzo: number | null;
+  nota: string | null;
 }
 
 export interface PruebaFisica {
@@ -103,6 +137,13 @@ export interface Comentario {
   fecha: string;
   texto: string;
   categoria: string | null;
+}
+
+export interface Asistencia {
+  id: string;
+  atleta_id: string;
+  fecha: string;
+  presente: boolean;
 }
 
 export interface ImportacionLog {

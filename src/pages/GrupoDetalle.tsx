@@ -74,7 +74,7 @@ export default function GrupoDetalle() {
       : [];
 
   const atletasDisponiblesManual = atletasClub.filter(
-    (a) => calcularCategoria(a.fecha_nacimiento) === "Absoluto" && !atletasAsignados.some((x) => x.atleta_id === a.id),
+    (a) => !atletasAsignados.some((x) => x.atleta_id === a.id),
   );
 
   async function handleAsignarEntrenador() {
@@ -109,7 +109,7 @@ export default function GrupoDetalle() {
 
       <h1 className="mt-3 text-2xl font-bold text-navy-900">{grupo.nombre}</h1>
       <p className="mt-1 text-sm text-navy-800/70">
-        {grupo.tipo === "categoria_edad" ? `Por categoría de edad · ${grupo.categoria}` : "De entrenamiento (Absoluto)"}
+        {grupo.tipo === "categoria_edad" ? `Por categoría de edad · ${grupo.categoria}` : "De entrenamiento"}
       </p>
 
       <div className="mt-6 rounded-2xl border border-navy-900/10 bg-white p-5">
@@ -193,7 +193,7 @@ export default function GrupoDetalle() {
           {atletasDisponiblesManual.length > 0 && (
             <div className="mt-4 flex gap-2">
               <select value={atletaSeleccionado} onChange={(e) => setAtletaSeleccionado(e.target.value)} className="input">
-                <option value="">Seleccionar atleta (categoría Absoluto)…</option>
+                <option value="">Seleccionar atleta…</option>
                 {atletasDisponiblesManual.map((a) => (
                   <option key={a.id} value={a.id}>
                     {a.apellidos}, {a.nombre}

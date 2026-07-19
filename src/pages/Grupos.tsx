@@ -43,8 +43,9 @@ export default function Grupos() {
         </button>
       </div>
       <p className="mt-1 text-sm text-navy-800/70">
-        Los grupos "por edad" agrupan automáticamente a los atletas según su categoría. Los "de entrenamiento" son
-        para la categoría Absoluto, con asignación manual.
+        Los grupos "por edad" agrupan automáticamente a los atletas según su categoría de competición. Los "de
+        entrenamiento" son de asignación manual, para cualquier edad — por ejemplo, la Escuela Base o los grupos de
+        Absoluto.
       </p>
 
       {mostrarForm && club && (
@@ -64,7 +65,7 @@ export default function Grupos() {
       ) : (
         <>
           <SeccionGrupos titulo="Por categoría de edad" grupos={gruposEdad} />
-          <SeccionGrupos titulo="De entrenamiento (Absoluto)" grupos={gruposEntrenamiento} />
+          <SeccionGrupos titulo="De entrenamiento" grupos={gruposEntrenamiento} />
         </>
       )}
     </div>
@@ -130,7 +131,7 @@ function FormularioGrupo({ clubId, onCreado }: { clubId: string; onCreado: () =>
         <span className="font-medium text-navy-800">Tipo</span>
         <select value={tipo} onChange={(e) => setTipo(e.target.value as TipoGrupo)} className="input mt-1">
           <option value="categoria_edad">Por categoría de edad</option>
-          <option value="entrenamiento">De entrenamiento (Absoluto)</option>
+          <option value="entrenamiento">De entrenamiento (manual)</option>
         </select>
       </label>
 

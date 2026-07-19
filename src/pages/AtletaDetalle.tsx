@@ -152,7 +152,9 @@ export default function AtletaDetalle() {
                       {r.competicion.nombre}
                     </Link>
                   ) : (
-                    <span className="font-medium text-navy-900">Test de control</span>
+                    <span className="font-medium text-navy-900">
+                      {r.tipo === "competicion" ? "Competición (sin vincular)" : "Test de control"}
+                    </span>
                   )}
                   <span className="text-navy-800/60"> · {r.disciplina.nombre}</span>
                 </div>

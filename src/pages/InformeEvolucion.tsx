@@ -197,7 +197,7 @@ export default function InformeEvolucion() {
 
   return (
     <div className="max-w-4xl">
-      <Link to={`/atletas/${atleta.id}`} className="text-sm text-navy-800/60 hover:text-navy-900">
+      <Link to={`/atletas/${atleta.id}`} className="text-sm text-navy-800/60 hover:text-navy-900 print:hidden">
         ← Volver a la ficha
       </Link>
 
@@ -220,7 +220,7 @@ export default function InformeEvolucion() {
           </div>
         </div>
 
-        <div className="flex flex-wrap items-end gap-2">
+        <div className="flex flex-wrap items-end gap-2 print:hidden">
           {disciplinasConResultados.length > 1 && (
             <label className="block text-xs">
               <span className="font-medium text-navy-800">Prueba</span>
@@ -242,26 +242,39 @@ export default function InformeEvolucion() {
             <input type="date" value={fechaFin} onChange={(e) => setFechaFin(e.target.value)} className="input mt-1" />
           </label>
         </div>
+
+        <p className="hidden text-sm text-navy-800/70 print:block">
+          {disciplina ? disciplina.nombre : "Todas las pruebas"} · Del {new Date(fechaInicio).toLocaleDateString("es-ES")} al{" "}
+          {new Date(fechaFin).toLocaleDateString("es-ES")}
+        </p>
       </div>
 
-      <div className="mt-4">
+      <div className="mt-4 flex gap-3 print:hidden">
         <button
           onClick={() => setMostrarForm((v) => !v)}
           className="rounded-lg bg-navy-900 px-4 py-2 text-sm font-semibold text-gold-300 hover:bg-navy-800"
         >
           {mostrarForm ? "Cancelar" : "Registrar resultado"}
         </button>
+        <button
+          onClick={() => window.print()}
+          className="rounded-lg border border-navy-900/20 px-4 py-2 text-sm font-semibold text-navy-900 hover:bg-white"
+        >
+          Descargar informe (PDF)
+        </button>
       </div>
 
       {mostrarForm && (
-        <RegistrarResultadoForm
-          atletaId={atleta.id}
-          disciplinas={disciplinas}
-          onGuardado={() => {
-            setMostrarForm(false);
-            cargar();
-          }}
-        />
+        <div className="print:hidden">
+          <RegistrarResultadoForm
+            atletaId={atleta.id}
+            disciplinas={disciplinas}
+            onGuardado={() => {
+              setMostrarForm(false);
+              cargar();
+            }}
+          />
+        </div>
       )}
 
       {!disciplina ? (
@@ -292,7 +305,7 @@ export default function InformeEvolucion() {
               <p className="mt-1 font-display text-2xl text-navy-900">
                 {porcentajeAsistencia !== null ? `${Math.round(porcentajeAsistencia)}%` : "—"}
               </p>
-              <div className="mt-2 flex gap-2 text-xs">
+              <div className="mt-2 flex gap-2 text-xs print:hidden">
                 <button onClick={() => handleMarcarAsistencia(true)} className="font-medium text-navy-900 hover:underline">
                   Presente hoy
                 </button>
@@ -321,7 +334,7 @@ export default function InformeEvolucion() {
             </p>
           )}
 
-          <section className="mt-8">
+          <section className="mt-8 print:break-inside-avoid">
             <h2 className="text-xs font-semibold uppercase tracking-wide text-navy-800/60">Progresión de marca · {disciplina.nombre}</h2>
             <div className="mt-3 rounded-2xl border border-navy-900/10 bg-white p-4">
               {datosProgresion.length === 0 ? (
@@ -332,7 +345,7 @@ export default function InformeEvolucion() {
             </div>
           </section>
 
-          <section className="mt-8">
+          <section className="mt-8 print:break-inside-avoid">
             <h2 className="text-xs font-semibold uppercase tracking-wide text-navy-800/60">
               {ETIQUETAS_TIPO_PRUEBA[tipoFisicoRelevante]} vs. marca deportiva
             </h2>
@@ -350,7 +363,7 @@ export default function InformeEvolucion() {
           </section>
 
           {(familia === "saltos" || familia === "lanzamientos") && ultimoConIntentos?.intentos && (
-            <section className="mt-8">
+            <section className="mt-8 print:break-inside-avoid">
               <h2 className="text-xs font-semibold uppercase tracking-wide text-navy-800/60">
                 Intentos · {new Date(ultimoConIntentos.fecha).toLocaleDateString("es-ES")}
               </h2>
@@ -370,7 +383,7 @@ export default function InformeEvolucion() {
           )}
 
           {familia === "fondo" && ultimoConRitmo?.ritmo_por_km && (
-            <section className="mt-8">
+            <section className="mt-8 print:break-inside-avoid">
               <h2 className="text-xs font-semibold uppercase tracking-wide text-navy-800/60">
                 Ritmo / FC por km · {new Date(ultimoConRitmo.fecha).toLocaleDateString("es-ES")}
               </h2>
@@ -395,7 +408,17 @@ export default function InformeEvolucion() {
                     {[...resultadosEnRango].reverse().map((r) => (
                       <tr key={r.id} className="border-t border-navy-900/5 first:border-0">
                         <td className="px-4 py-2 text-navy-800/60">{new Date(r.fecha).toLocaleDateString("es-ES")}</td>
-                        <td className="px-4 py-2 text-navy-800/70">{r.tipo === "competicion" ? r.competicion?.nombre ?? "Competición" : "Test de control"}</td>
+                        <td className="px-4 py-2 text-navy-800/70">
+                          {r.competicion ? (
+                            <Link to={`/competiciones/${r.competicion.id}`} className="hover:underline">
+                              {r.competicion.nombre}
+                            </Link>
+                          ) : r.tipo === "competicion" ? (
+                            "Competición (sin vincular)"
+                          ) : (
+                            "Test de control"
+                          )}
+                        </td>
                         <td className="px-4 py-2 text-right font-semibold text-navy-900">
                           {r.marca}
                           {r.validez !== "valido" && <span className="ml-2 text-xs font-medium text-red-600">{r.validez === "nulo" ? "Nulo" : "No presentado"}</span>}

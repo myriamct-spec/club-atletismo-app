@@ -1,7 +1,8 @@
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { createResultado } from "../lib/resultados";
+import { listCompeticiones } from "../lib/competiciones";
 import { mensajeError } from "../lib/errors";
-import type { Disciplina, Intento, Parcial, RitmoKm, TipoResultado, ValidezResultado } from "../types/database";
+import type { Competicion, Disciplina, Intento, Parcial, RitmoKm, TipoResultado, ValidezResultado } from "../types/database";
 
 const ETIQUETAS_VALIDEZ: Record<ValidezResultado, string> = {
   valido: "Válido",
@@ -36,6 +37,14 @@ export function RegistrarResultadoForm({
   const [tipo, setTipo] = useState<TipoResultado>("competicion");
   const [resultado, setResultado] = useState("");
   const [validez, setValidez] = useState<ValidezResultado>("valido");
+  const [competiciones, setCompeticiones] = useState<Competicion[]>([]);
+  const [competicionId, setCompeticionId] = useState("");
+
+  useEffect(() => {
+    listCompeticiones()
+      .then(setCompeticiones)
+      .catch(() => setCompeticiones([]));
+  }, []);
 
   const [ampliado, setAmpliado] = useState(false);
   const [intentos, setIntentos] = useState<Intento[]>([]);
@@ -67,6 +76,7 @@ export function RegistrarResultadoForm({
       await createResultado({
         atleta_id: atletaId,
         disciplina_id: disciplinaId,
+        competicion_id: tipo === "competicion" && competicionId ? competicionId : null,
         marca: resultado,
         puesto: null,
         viento: null,
@@ -140,7 +150,16 @@ export function RegistrarResultadoForm({
         </label>
         <label className="block text-sm">
           <span className="font-medium text-navy-800">Tipo *</span>
-          <select required value={tipo} onChange={(e) => setTipo(e.target.value as TipoResultado)} className="input mt-1">
+          <select
+            required
+            value={tipo}
+            onChange={(e) => {
+              const nuevoTipo = e.target.value as TipoResultado;
+              setTipo(nuevoTipo);
+              if (nuevoTipo === "test_control") setCompeticionId("");
+            }}
+            className="input mt-1"
+          >
             <option value="competicion">Competición</option>
             <option value="test_control">Test de control</option>
           </select>
@@ -156,6 +175,29 @@ export function RegistrarResultadoForm({
           </select>
         </label>
       </div>
+
+      {tipo === "competicion" && competiciones.length > 0 && (
+        <label className="block text-sm">
+          <span className="font-medium text-navy-800">Competición</span>
+          <select
+            value={competicionId}
+            onChange={(e) => {
+              const nuevaCompeticionId = e.target.value;
+              setCompeticionId(nuevaCompeticionId);
+              const competicion = competiciones.find((c) => c.id === nuevaCompeticionId);
+              if (competicion) setFecha(competicion.fecha);
+            }}
+            className="input mt-1 max-w-sm"
+          >
+            <option value="">Sin vincular</option>
+            {competiciones.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.nombre} · {new Date(c.fecha).toLocaleDateString("es-ES")}
+              </option>
+            ))}
+          </select>
+        </label>
+      )}
 
       <label className="block text-sm">
         <span className="font-medium text-navy-800">

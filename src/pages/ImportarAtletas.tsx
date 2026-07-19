@@ -163,7 +163,7 @@ export default function ImportarAtletas() {
       <h1 className="text-2xl font-bold text-navy-900">Importar atletas desde Excel</h1>
       <p className="mt-1 text-sm text-navy-800/70">
         Columnas esperadas: {CABECERAS.join(", ")}. El grupo del atleta se asigna después, desde "Grupos" (automático
-        por categoría de edad, o manual para la categoría Absoluto).
+        por categoría de edad, o manual para grupos de entrenamiento por horario o especialidad).
       </p>
 
       <div className="mt-6 flex flex-wrap gap-3">

@@ -43,9 +43,10 @@ export default function Grupos() {
         </button>
       </div>
       <p className="mt-1 text-sm text-navy-800/70">
-        Los grupos "por edad" agrupan automáticamente a los atletas según su categoría de competición. Los "de
-        entrenamiento" son de asignación manual, para cualquier edad — por ejemplo, la Escuela Base o los grupos de
-        Absoluto.
+        Los grupos "por categoría de edad" agrupan automáticamente a los atletas según la categoría que les
+        corresponde cada temporada (Psicomotricidad, Sub-8… hasta Master), calculada a partir de su fecha de
+        nacimiento. Los grupos "de entrenamiento" son de asignación manual, para organizar horarios o especialidades
+        dentro de una categoría — por ejemplo, dos grupos de Sub-8 en turnos distintos.
       </p>
 
       {mostrarForm && club && (

@@ -112,7 +112,7 @@ export default function AtletaDetalle() {
 
         {grupos.length === 0 ? (
           <p className="mt-2 text-sm text-navy-800/60">
-            {categoria === "Absoluto"
+            {categoria === "Absoluta"
               ? "Sin grupo de entrenamiento asignado todavía."
               : "Todavía no hay un grupo creado para esta categoría."}
             {usuario?.rol === "admin" && (

@@ -1,49 +1,38 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { listEntrenadores } from "../lib/usuarios";
-import {
-  asignarEntrenador,
-  getAtleta,
-  listEntrenadoresAsignados,
-  quitarEntrenador,
-  type AsignacionConEntrenador,
-} from "../lib/atletas";
+import { getAtleta } from "../lib/atletas";
 import { calcularCategoria, calcularEdad } from "../lib/categorias";
 import { listResultadosPorAtleta, type ResultadoConCompeticion } from "../lib/resultados";
+import { listGruposDeAtleta } from "../lib/grupos";
 import { PruebasFisicasSeccion } from "../components/PruebasFisicasSeccion";
 import { ComentariosSeccion } from "../components/ComentariosSeccion";
-import type { Atleta, Usuario } from "../types/database";
+import type { Atleta, Grupo } from "../types/database";
 import { mensajeError } from "../lib/errors";
 
 export default function AtletaDetalle() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { usuario, club } = useAuth();
+  const { usuario } = useAuth();
 
   const [atleta, setAtleta] = useState<Atleta | null>(null);
   const [resultados, setResultados] = useState<ResultadoConCompeticion[]>([]);
-  const [asignaciones, setAsignaciones] = useState<AsignacionConEntrenador[]>([]);
-  const [entrenadoresClub, setEntrenadoresClub] = useState<Usuario[]>([]);
+  const [grupos, setGrupos] = useState<Grupo[]>([]);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [entrenadorSeleccionado, setEntrenadorSeleccionado] = useState("");
 
   async function cargar() {
-    if (!id || !club) return;
+    if (!id) return;
     setCargando(true);
     try {
-      const [atletaData, asignacionesData, resultadosData] = await Promise.all([
-        getAtleta(id),
-        listEntrenadoresAsignados(id),
-        listResultadosPorAtleta(id),
-      ]);
+      const atletaData = await getAtleta(id);
       setAtleta(atletaData);
-      setAsignaciones(asignacionesData);
+      const [resultadosData, gruposData] = await Promise.all([
+        listResultadosPorAtleta(id),
+        atletaData ? listGruposDeAtleta(atletaData) : Promise.resolve([]),
+      ]);
       setResultados(resultadosData);
-      if (usuario?.rol === "admin") {
-        setEntrenadoresClub(await listEntrenadores(club.id));
-      }
+      setGrupos(gruposData);
     } catch (err) {
       setError(mensajeError(err, "No se pudo cargar la ficha."));
     } finally {
@@ -54,27 +43,13 @@ export default function AtletaDetalle() {
   useEffect(() => {
     cargar();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id, club?.id]);
-
-  async function handleAsignar() {
-    if (!id || !entrenadorSeleccionado) return;
-    await asignarEntrenador(id, entrenadorSeleccionado);
-    setEntrenadorSeleccionado("");
-    cargar();
-  }
-
-  async function handleQuitar(asignacionId: string) {
-    await quitarEntrenador(asignacionId);
-    cargar();
-  }
+  }, [id]);
 
   if (cargando) return <p className="text-sm text-navy-800/60">Cargando…</p>;
   if (error) return <p className="text-sm text-red-600">{error}</p>;
   if (!atleta) return <p className="text-sm text-navy-800/60">No se encontró el atleta.</p>;
 
-  const entrenadoresDisponibles = entrenadoresClub.filter(
-    (e) => !asignaciones.some((a) => a.entrenador_id === e.id),
-  );
+  const categoria = calcularCategoria(atleta.fecha_nacimiento);
 
   return (
     <div className="max-w-3xl">
@@ -105,7 +80,7 @@ export default function AtletaDetalle() {
             )}
           </div>
           <p className="mt-1 text-sm text-navy-800/70">
-            {calcularCategoria(atleta.fecha_nacimiento)} · {calcularEdad(atleta.fecha_nacimiento)} años
+            {categoria} · {calcularEdad(atleta.fecha_nacimiento)} años
             {atleta.id_socio && <> · Socio {atleta.id_socio}</>}
           </p>
           <div className="mt-3 flex gap-2">
@@ -133,47 +108,33 @@ export default function AtletaDetalle() {
       )}
 
       <div className="mt-6 rounded-2xl border border-navy-900/10 bg-white p-5">
-        <p className="text-xs font-semibold uppercase tracking-wide text-navy-800/60">Entrenadores asignados</p>
+        <p className="text-xs font-semibold uppercase tracking-wide text-navy-800/60">Grupo</p>
 
-        {asignaciones.length === 0 ? (
-          <p className="mt-2 text-sm text-navy-800/60">Sin entrenador asignado todavía.</p>
+        {grupos.length === 0 ? (
+          <p className="mt-2 text-sm text-navy-800/60">
+            {categoria === "Absoluto"
+              ? "Sin grupo de entrenamiento asignado todavía."
+              : "Todavía no hay un grupo creado para esta categoría."}
+            {usuario?.rol === "admin" && (
+              <>
+                {" "}
+                <Link to="/grupos" className="text-navy-900 underline">
+                  Gestionar grupos
+                </Link>
+                .
+              </>
+            )}
+          </p>
         ) : (
-          <ul className="mt-3 space-y-2">
-            {asignaciones.map((a) => (
-              <li key={a.id} className="flex items-center justify-between text-sm">
-                <span className="text-navy-900">{a.entrenador.nombre}</span>
-                {usuario?.rol === "admin" && (
-                  <button onClick={() => handleQuitar(a.id)} className="text-xs font-medium text-red-600 hover:underline">
-                    Quitar
-                  </button>
-                )}
+          <ul className="mt-2 space-y-1">
+            {grupos.map((g) => (
+              <li key={g.id} className="text-sm">
+                <Link to={`/grupos/${g.id}`} className="font-medium text-navy-900 hover:underline">
+                  {g.nombre}
+                </Link>
               </li>
             ))}
           </ul>
-        )}
-
-        {usuario?.rol === "admin" && entrenadoresDisponibles.length > 0 && (
-          <div className="mt-4 flex gap-2">
-            <select
-              value={entrenadorSeleccionado}
-              onChange={(e) => setEntrenadorSeleccionado(e.target.value)}
-              className="input"
-            >
-              <option value="">Seleccionar entrenador…</option>
-              {entrenadoresDisponibles.map((e) => (
-                <option key={e.id} value={e.id}>
-                  {e.nombre}
-                </option>
-              ))}
-            </select>
-            <button
-              onClick={handleAsignar}
-              disabled={!entrenadorSeleccionado}
-              className="whitespace-nowrap rounded-lg bg-navy-900 px-4 py-2 text-sm font-semibold text-gold-300 hover:bg-navy-800 disabled:opacity-50"
-            >
-              Asignar
-            </button>
-          </div>
         )}
       </div>
 

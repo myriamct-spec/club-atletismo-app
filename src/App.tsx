@@ -11,6 +11,9 @@ import InformeEvolucion from "./pages/InformeEvolucion";
 import Competiciones from "./pages/Competiciones";
 import CompeticionForm from "./pages/CompeticionForm";
 import CompeticionDetalle from "./pages/CompeticionDetalle";
+import Entrenadores from "./pages/Entrenadores";
+import Grupos from "./pages/Grupos";
+import GrupoDetalle from "./pages/GrupoDetalle";
 import Ajustes from "./pages/Ajustes";
 
 const ImportarAtletas = lazy(() => import("./pages/ImportarAtletas"));
@@ -51,6 +54,9 @@ export default function App() {
                 </Suspense>
               }
             />
+            <Route path="/entrenadores" element={<Entrenadores />} />
+            <Route path="/grupos" element={<Grupos />} />
+            <Route path="/grupos/:id" element={<GrupoDetalle />} />
             <Route path="/ajustes" element={<Ajustes />} />
           </Route>
         </Route>

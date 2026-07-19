@@ -34,12 +34,26 @@ export interface Atleta {
   activo: boolean;
 }
 
-export interface EntrenadorAtleta {
+export type TipoGrupo = "categoria_edad" | "entrenamiento";
+
+export interface Grupo {
+  id: string;
+  club_id: string;
+  nombre: string;
+  tipo: TipoGrupo;
+  categoria: string | null;
+}
+
+export interface EntrenadorGrupo {
+  id: string;
+  grupo_id: string;
+  entrenador_id: string;
+}
+
+export interface AtletaGrupo {
   id: string;
   atleta_id: string;
-  entrenador_id: string;
-  fecha_asignacion: string;
-  activo: boolean;
+  grupo_id: string;
 }
 
 export interface Disciplina {

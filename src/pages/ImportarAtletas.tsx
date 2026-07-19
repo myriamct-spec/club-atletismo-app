@@ -3,21 +3,17 @@ import { useNavigate } from "react-router-dom";
 import * as XLSX from "xlsx";
 import { useAuth } from "../context/AuthContext";
 import { supabase } from "../lib/supabase";
-import { asignarEntrenador, createAtleta, listAtletas } from "../lib/atletas";
-import { listEntrenadores } from "../lib/usuarios";
+import { createAtleta, listAtletas } from "../lib/atletas";
 import { normalizarClave, parseFechaExcel } from "../lib/excel";
-import type { Usuario } from "../types/database";
 import { mensajeError } from "../lib/errors";
 
-const CABECERAS = ["Nombre", "Apellidos", "Fecha_nacimiento", "Genero", "ID_Socio", "Entrenadores"];
+const CABECERAS = ["Nombre", "Apellidos", "Fecha_nacimiento", "Genero", "ID_Socio"];
 const CLAVE_A_CAMPO: Record<string, string> = {
   nombre: "nombre",
   apellidos: "apellidos",
   fechanacimiento: "fecha_nacimiento",
   genero: "genero",
   idsocio: "id_socio",
-  entrenadores: "entrenadores",
-  entrenador: "entrenadores",
 };
 
 type FilaImportacion = {
@@ -27,17 +23,12 @@ type FilaImportacion = {
   fecha_nacimiento: string | null;
   genero: string;
   id_socio: string;
-  entrenadoresTexto: string;
-  entrenadoresIds: string[];
   errores: string[];
 };
 
 function descargarPlantilla() {
   const wb = XLSX.utils.book_new();
-  const ws = XLSX.utils.aoa_to_sheet([
-    CABECERAS,
-    ["Laura", "Gómez Ruiz", "15/03/2011", "Femenino", "SOC-0142", "entrenador@club-aurora.es"],
-  ]);
+  const ws = XLSX.utils.aoa_to_sheet([CABECERAS, ["Laura", "Gómez Ruiz", "15/03/2011", "Femenino", "SOC-0142"]]);
   XLSX.utils.book_append_sheet(wb, ws, "Atletas");
   XLSX.writeFile(wb, "plantilla_atletas.xlsx");
 }
@@ -62,15 +53,9 @@ export default function ImportarAtletas() {
     setNombreArchivo(file.name);
 
     try {
-      const [existentes, entrenadoresClub] = await Promise.all([
-        listAtletas(),
-        listEntrenadores(club.id),
-      ]);
+      const existentes = await listAtletas();
       const idSociosExistentes = new Set(
         existentes.map((a) => a.id_socio).filter((v): v is string => Boolean(v)),
-      );
-      const entrenadoresPorEmail = new Map<string, Usuario>(
-        entrenadoresClub.map((e) => [e.email.toLowerCase().trim(), e]),
       );
 
       const buffer = await file.arrayBuffer();
@@ -91,7 +76,6 @@ export default function ImportarAtletas() {
         const apellidos = String(normalizada.apellidos ?? "").trim();
         const genero = String(normalizada.genero ?? "").trim();
         const id_socio = String(normalizada.id_socio ?? "").trim();
-        const entrenadoresTexto = String(normalizada.entrenadores ?? "").trim();
         const fecha_nacimiento = parseFechaExcel(normalizada.fecha_nacimiento);
 
         const errores: string[] = [];
@@ -107,29 +91,7 @@ export default function ImportarAtletas() {
           idSociosVistos.add(id_socio);
         }
 
-        const entrenadoresIds: string[] = [];
-        if (entrenadoresTexto) {
-          for (const email of entrenadoresTexto.split(";").map((e) => e.trim()).filter(Boolean)) {
-            const entrenador = entrenadoresPorEmail.get(email.toLowerCase());
-            if (entrenador) {
-              entrenadoresIds.push(entrenador.id);
-            } else {
-              errores.push(`Entrenador no encontrado: ${email}`);
-            }
-          }
-        }
-
-        return {
-          fila: index + 2,
-          nombre,
-          apellidos,
-          fecha_nacimiento,
-          genero,
-          id_socio,
-          entrenadoresTexto,
-          entrenadoresIds,
-          errores,
-        };
+        return { fila: index + 2, nombre, apellidos, fecha_nacimiento, genero, id_socio, errores };
       });
 
       setFilas(procesadas);
@@ -148,7 +110,7 @@ export default function ImportarAtletas() {
 
     for (const fila of validas) {
       try {
-        const creado = await createAtleta({
+        await createAtleta({
           club_id: club.id,
           nombre: fila.nombre,
           apellidos: fila.apellidos,
@@ -160,9 +122,6 @@ export default function ImportarAtletas() {
           lesionado: false,
           activo: true,
         });
-        for (const entrenadorId of fila.entrenadoresIds) {
-          await asignarEntrenador(creado.id, entrenadorId);
-        }
         ok += 1;
       } catch {
         // el resumen final refleja el recuento; el detalle ya se validó en la vista previa
@@ -193,7 +152,8 @@ export default function ImportarAtletas() {
     <div className="max-w-4xl">
       <h1 className="text-2xl font-bold text-navy-900">Importar atletas desde Excel</h1>
       <p className="mt-1 text-sm text-navy-800/70">
-        Columnas esperadas: {CABECERAS.join(", ")}. "Entrenadores" acepta uno o varios emails separados por punto y coma.
+        Columnas esperadas: {CABECERAS.join(", ")}. El grupo del atleta se asigna después, desde "Grupos" (automático
+        por categoría de edad, o manual para la categoría Absoluto).
       </p>
 
       <div className="mt-6 flex flex-wrap gap-3">

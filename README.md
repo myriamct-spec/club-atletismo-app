@@ -33,16 +33,18 @@ Gestión de atletas, resultados de competición, pruebas físicas y comentarios 
 - [x] Registro de pruebas físicas (tipo, valor, unidad, protocolo)
 - [x] Comentarios del entrenador (histórico fechado, por categoría)
 - [x] Informe de evolución del atleta (resultados + pruebas físicas + comentarios, por rango de fechas)
+- [x] Alta de entrenadores y gestión de grupos (por categoría de edad o de entrenamiento), sustituyendo la asignación directa entrenador↔atleta
 
 ## Modelo de datos
 
 Ver `supabase/migrations/0001_init.sql`. Puntos clave acordados durante la fase de ideación:
 
-- Relación entrenador↔atleta es N:M (`entrenador_atleta`), gestionada solo por el administrador.
+- La relación entrenador↔atleta ya no es directa: un entrenador se asigna a uno o varios **grupos** (`0005_grupos.sql`), y un atleta pertenece a un grupo de dos formas — por **categoría de edad** (automático, calculado desde `fecha_nacimiento` con `categoria_atleta()` en SQL, réplica de `calcularCategoria()` en `lib/categorias.ts`; hay que mantener ambas en sync si se toca una) o por **grupo de entrenamiento** (manual, solo para la categoría Absoluto, tabla `atleta_grupo`). La gestión de grupos y entrenadores la hace solo el administrador.
+- Dar de alta un entrenador crea también su usuario de Supabase Auth vía `auth.signUp()` con un cliente aislado (`lib/supabaseAdmin.ts`) para no cerrar la sesión del admin — es la única vía practicable sin exponer una clave de servicio en el cliente. Si el proyecto tiene "Confirm email" activado, el entrenador no puede entrar hasta confirmar el correo (o hasta que se confirme a mano desde el dashboard).
 - `atletas.id_socio` sustituye al DNI como identificador único (no se almacenan datos de carácter especial).
 - `atletas.observaciones_generales` es una nota libre sin fecha en la ficha; el histórico fechado de valoraciones del entrenador vive en `comentarios` y es lo que alimenta el informe de evolución.
 - El logo del club (`clubs.logo_url`) se sube a Supabase Storage (`club-assets`) y es editable por el administrador desde `/ajustes`, sin necesidad de nuevo despliegue. El logo oficial del club (escudo con corredor alado) se sube así una vez desplegada la app; mientras tanto la interfaz usa un marcador con la inicial del club sobre la paleta marino/dorado real.
-- El alta de atletas (manual o por Excel) la hace el administrador, que también gestiona qué entrenadores tiene asignados cada atleta; un entrenador solo ve y edita los atletas que tiene asignados (`atleta_visible()` en RLS).
+- El alta de atletas (manual o por Excel) la hace el administrador; un entrenador solo ve y edita los atletas de sus grupos (`atleta_visible()` en RLS, redefinida en `0005_grupos.sql`). La importación de atletas ya no pide entrenadores: la pertenencia a grupo se resuelve después, desde `/grupos`.
 - Alta de competiciones: formulario manual + importación masiva por Excel, en dos pasos (primero se crea la competición, luego se suben sus resultados). Sin integración automática con RFEA/FAMU en el MVP (ver historial de prompts para el análisis de viabilidad).
 - La importación de resultados prioriza `ID_Socio` para identificar al atleta; si no se indica, cruza por nombre y apellidos y marca error si es ambiguo o no lo encuentra (no se descarta la fila en silencio).
 - Pruebas físicas y comentarios quedan atribuidos a quien los registra: la política de alta exige `entrenador_id = auth.uid()` (`0003_autoria.sql`), no solo que el atleta sea visible para el usuario.

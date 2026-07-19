@@ -12,7 +12,7 @@ export function AppLayout() {
 
   return (
     <div className="flex min-h-screen bg-ground">
-      <aside className="flex w-60 flex-shrink-0 flex-col gap-6 bg-navy-900 p-5 text-white">
+      <aside className="flex w-60 flex-shrink-0 flex-col gap-6 bg-navy-900 p-5 text-white print:hidden">
         <div className="flex items-center gap-3">
           <ClubLogo size={40} />
           <div className="leading-tight">
@@ -60,7 +60,7 @@ export function AppLayout() {
         </div>
       </aside>
 
-      <main className="flex-1 p-8">
+      <main className="flex-1 p-8 print:p-0">
         <Outlet />
       </main>
     </div>

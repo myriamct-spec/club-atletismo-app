@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { useEffect, useState, type FormEvent } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { listEntrenadores } from "../lib/usuarios";
 import { listAtletas } from "../lib/atletas";
-import { calcularCategoria } from "../lib/categorias";
+import { calcularCategoria, CATEGORIAS_EDAD_ASIGNABLES } from "../lib/categorias";
 import {
   getGrupo,
   listEntrenadoresDeGrupo,
@@ -12,15 +12,18 @@ import {
   listAtletasManualDeGrupo,
   asignarAtletaAGrupo,
   quitarAtletaDeGrupo,
+  updateGrupo,
+  deleteGrupo,
   type AsignacionEntrenador,
   type AsignacionAtleta,
 } from "../lib/grupos";
 import { mensajeError } from "../lib/errors";
-import type { Atleta, Grupo, Usuario } from "../types/database";
+import type { Atleta, Grupo, TipoGrupo, Usuario } from "../types/database";
 
 export default function GrupoDetalle() {
   const { id } = useParams();
-  const { club } = useAuth();
+  const navigate = useNavigate();
+  const { club, usuario } = useAuth();
 
   const [grupo, setGrupo] = useState<Grupo | null>(null);
   const [entrenadoresAsignados, setEntrenadoresAsignados] = useState<AsignacionEntrenador[]>([]);
@@ -31,6 +34,8 @@ export default function GrupoDetalle() {
   const [error, setError] = useState<string | null>(null);
   const [entrenadorSeleccionado, setEntrenadorSeleccionado] = useState("");
   const [atletaSeleccionado, setAtletaSeleccionado] = useState("");
+  const [editando, setEditando] = useState(false);
+  const [eliminando, setEliminando] = useState(false);
 
   async function cargar() {
     if (!id || !club) return;
@@ -101,16 +106,62 @@ export default function GrupoDetalle() {
     cargar();
   }
 
+  async function handleEliminarGrupo() {
+    if (!grupo) return;
+    if (!window.confirm(`¿Eliminar el grupo "${grupo.nombre}"? Se perderán sus asignaciones de entrenadores y atletas.`)) {
+      return;
+    }
+    setEliminando(true);
+    try {
+      await deleteGrupo(grupo.id);
+      navigate("/grupos");
+    } catch (err) {
+      setError(mensajeError(err, "No se pudo eliminar el grupo."));
+      setEliminando(false);
+    }
+  }
+
+  const esAdmin = usuario?.rol === "admin";
+
   return (
     <div className="max-w-2xl">
       <Link to="/grupos" className="text-sm text-navy-800/60 hover:text-navy-900">
         ← Volver a grupos
       </Link>
 
-      <h1 className="mt-3 text-2xl font-bold text-navy-900">{grupo.nombre}</h1>
-      <p className="mt-1 text-sm text-navy-800/70">
-        {grupo.tipo === "categoria_edad" ? `Por categoría de edad · ${grupo.categoria}` : "De entrenamiento"}
-      </p>
+      {editando ? (
+        <FormularioEdicionGrupo
+          grupo={grupo}
+          onGuardado={() => {
+            setEditando(false);
+            cargar();
+          }}
+          onCancelar={() => setEditando(false)}
+        />
+      ) : (
+        <div className="mt-3 flex items-start justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold text-navy-900">{grupo.nombre}</h1>
+            <p className="mt-1 text-sm text-navy-800/70">
+              {grupo.tipo === "categoria_edad" ? `Por categoría de edad · ${grupo.categoria}` : "De entrenamiento"}
+            </p>
+          </div>
+          {esAdmin && (
+            <div className="flex shrink-0 gap-3 pt-1">
+              <button onClick={() => setEditando(true)} className="text-xs font-medium text-navy-800 hover:underline">
+                Editar
+              </button>
+              <button
+                onClick={handleEliminarGrupo}
+                disabled={eliminando}
+                className="text-xs font-medium text-red-600 hover:underline disabled:opacity-50"
+              >
+                {eliminando ? "Eliminando…" : "Eliminar"}
+              </button>
+            </div>
+          )}
+        </div>
+      )}
 
       <div className="mt-6 rounded-2xl border border-navy-900/10 bg-white p-5">
         <p className="text-xs font-semibold uppercase tracking-wide text-navy-800/60">Entrenadores asignados</p>
@@ -212,5 +263,88 @@ export default function GrupoDetalle() {
         </div>
       )}
     </div>
+  );
+}
+
+function FormularioEdicionGrupo({
+  grupo,
+  onGuardado,
+  onCancelar,
+}: {
+  grupo: Grupo;
+  onGuardado: () => void;
+  onCancelar: () => void;
+}) {
+  const [nombre, setNombre] = useState(grupo.nombre);
+  const [tipo, setTipo] = useState<TipoGrupo>(grupo.tipo);
+  const [categoria, setCategoria] = useState(grupo.categoria ?? CATEGORIAS_EDAD_ASIGNABLES[0]);
+  const [guardando, setGuardando] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function handleSubmit(e: FormEvent) {
+    e.preventDefault();
+    setGuardando(true);
+    setError(null);
+    try {
+      await updateGrupo(grupo.id, {
+        nombre,
+        tipo,
+        categoria: tipo === "categoria_edad" ? categoria : null,
+      });
+      onGuardado();
+    } catch (err) {
+      setError(mensajeError(err, "No se pudo guardar el grupo."));
+    } finally {
+      setGuardando(false);
+    }
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="mt-3 space-y-4 rounded-2xl border border-navy-900/10 bg-white p-5">
+      <label className="block text-sm">
+        <span className="font-medium text-navy-800">Nombre *</span>
+        <input required value={nombre} onChange={(e) => setNombre(e.target.value)} className="input mt-1" />
+      </label>
+
+      <label className="block text-sm">
+        <span className="font-medium text-navy-800">Tipo</span>
+        <select value={tipo} onChange={(e) => setTipo(e.target.value as TipoGrupo)} className="input mt-1">
+          <option value="categoria_edad">Por categoría de edad</option>
+          <option value="entrenamiento">De entrenamiento (manual)</option>
+        </select>
+      </label>
+
+      {tipo === "categoria_edad" && (
+        <label className="block text-sm">
+          <span className="font-medium text-navy-800">Categoría</span>
+          <select value={categoria} onChange={(e) => setCategoria(e.target.value)} className="input mt-1">
+            {CATEGORIAS_EDAD_ASIGNABLES.map((c) => (
+              <option key={c} value={c}>
+                {c}
+              </option>
+            ))}
+          </select>
+        </label>
+      )}
+
+      {error && <p className="text-sm text-red-600">{error}</p>}
+
+      <div className="flex gap-3">
+        <button
+          type="submit"
+          disabled={guardando}
+          className="rounded-lg bg-navy-900 px-5 py-2.5 text-sm font-semibold text-gold-300 hover:bg-navy-800 disabled:opacity-60"
+        >
+          {guardando ? "Guardando…" : "Guardar"}
+        </button>
+        <button
+          type="button"
+          onClick={onCancelar}
+          className="rounded-lg px-5 py-2.5 text-sm font-semibold text-navy-800 hover:bg-ground"
+        >
+          Cancelar
+        </button>
+      </div>
+    </form>
   );
 }

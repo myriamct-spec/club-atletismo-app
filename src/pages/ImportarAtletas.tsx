@@ -42,7 +42,10 @@ export default function ImportarAtletas() {
   const [nombreArchivo, setNombreArchivo] = useState("");
   const [procesando, setProcesando] = useState(false);
   const [importando, setImportando] = useState(false);
-  const [resultado, setResultado] = useState<{ ok: number; error: number } | null>(null);
+  const [resultado, setResultado] = useState<{
+    ok: number;
+    errores: { fila: number; nombre: string; mensaje: string }[];
+  } | null>(null);
   const [errorGeneral, setErrorGeneral] = useState<string | null>(null);
 
   async function handleFile(file: File) {
@@ -107,6 +110,7 @@ export default function ImportarAtletas() {
     setImportando(true);
     const validas = filas.filter((f) => f.errores.length === 0);
     let ok = 0;
+    const erroresGuardado: { fila: number; nombre: string; mensaje: string }[] = [];
 
     for (const fila of validas) {
       try {
@@ -123,10 +127,18 @@ export default function ImportarAtletas() {
           activo: true,
         });
         ok += 1;
-      } catch {
-        // el resumen final refleja el recuento; el detalle ya se validó en la vista previa
+      } catch (err) {
+        erroresGuardado.push({
+          fila: fila.fila,
+          nombre: `${fila.nombre} ${fila.apellidos}`,
+          mensaje: mensajeError(err, "Error desconocido al guardar"),
+        });
       }
     }
+
+    const erroresValidacion = filas
+      .filter((f) => f.errores.length > 0)
+      .map((f) => ({ fila: f.fila, nombre: `${f.nombre} ${f.apellidos}`, mensaje: f.errores.join("; ") }));
 
     await supabase.from("importacion_logs").insert({
       club_id: club.id,
@@ -136,12 +148,10 @@ export default function ImportarAtletas() {
       filas_totales: filas.length,
       filas_ok: ok,
       filas_error: filas.length - ok,
-      detalle_errores: JSON.stringify(
-        filas.filter((f) => f.errores.length > 0).map((f) => ({ fila: f.fila, errores: f.errores })),
-      ),
+      detalle_errores: JSON.stringify([...erroresValidacion, ...erroresGuardado]),
     });
 
-    setResultado({ ok, error: filas.length - ok });
+    setResultado({ ok, errores: [...erroresGuardado, ...erroresValidacion] });
     setImportando(false);
   }
 
@@ -242,8 +252,19 @@ export default function ImportarAtletas() {
         <div className="mt-6 rounded-2xl border border-navy-900/10 bg-white p-6">
           <p className="text-sm font-semibold text-navy-900">
             Importación completada: {resultado.ok} atletas creados
-            {resultado.error > 0 && `, ${resultado.error} con error`}.
+            {resultado.errores.length > 0 && `, ${resultado.errores.length} con error`}.
           </p>
+
+          {resultado.errores.length > 0 && (
+            <ul className="mt-3 space-y-1 text-sm">
+              {resultado.errores.map((e, i) => (
+                <li key={i} className="text-red-600">
+                  Fila {e.fila} ({e.nombre}): {e.mensaje}
+                </li>
+              ))}
+            </ul>
+          )}
+
           <button
             onClick={() => navigate("/atletas")}
             className="mt-4 rounded-lg bg-navy-900 px-4 py-2 text-sm font-semibold text-gold-300 hover:bg-navy-800"

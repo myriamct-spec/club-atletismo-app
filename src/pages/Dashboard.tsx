@@ -31,7 +31,7 @@ export default function Dashboard() {
     <div>
       <h1 className="text-2xl font-bold text-navy-900">Hola, {usuario?.nombre?.split(" ")[0]}</h1>
       <p className="mt-1 text-sm text-navy-800/70">
-        Panel del Club Atletismo Veloz Runners.
+        Panel del Club Atletismo UCAM Cartagena.
       </p>
 
       {error && <p className="mt-4 text-sm text-red-600">{error}</p>}

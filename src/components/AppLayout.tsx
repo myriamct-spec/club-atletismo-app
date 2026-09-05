@@ -17,7 +17,7 @@ export function AppLayout() {
           <ClubLogo size={40} />
           <div className="leading-tight">
             <p className="font-display text-sm tracking-wide text-white">
-              {club?.nombre ?? "Club Atletismo Veloz Runners"}
+              {club?.nombre ?? "Club Atletismo UCAM Cartagena"}
             </p>
             <p className="text-xs text-navy-100/60">Panel del entrenador</p>
           </div>

@@ -1,6 +1,6 @@
-# Club Atletismo Veloz Runners
+# Club Atletismo UCAM Cartagena
 
-App de gestión para club de atletismo — Hackathon Vibe Coding E6.
+App de gestión deportiva del Club Atletismo UCAM Cartagena.
 
 Gestión de atletas, resultados de competición, pruebas físicas y comentarios del entrenador, con informes de evolución de temporada. Construida con React + TypeScript + Vite (PWA instalable) y Supabase (base de datos, autenticación y almacenamiento).
 

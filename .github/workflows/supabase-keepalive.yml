@@ -1,9 +1,12 @@
 name: Supabase keep-alive
 
 # Los proyectos gratuitos de Supabase se pausan automáticamente tras 7 días
-# sin actividad en la API. Este workflow hace una petición inofensiva
-# (no toca ninguna tabla) cada pocos días para que el proyecto nunca llegue
-# a esos 7 días de inactividad.
+# sin actividad en la API. Este workflow hace una lectura inofensiva
+# (un "select id limit 1" de solo lectura, sujeto a las mismas políticas RLS
+# que ve cualquier visitante anónimo) cada pocos días para que el proyecto
+# nunca llegue a esos 7 días de inactividad. La raíz "/rest/v1/" no sirve
+# para esto: con el sistema nuevo de claves de Supabase, ese endpoint de
+# introspección exige la clave "secret", no la "publishable/anon".
 #
 # Requiere dos secretos del repositorio (Settings → Secrets and variables →
 # Actions → New repository secret), con los mismos valores que en .env:
@@ -25,7 +28,7 @@ jobs:
           SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
         run: |
           response=$(curl -sS -w "\n%{http_code}" \
-            "${SUPABASE_URL}/rest/v1/" \
+            "${SUPABASE_URL}/rest/v1/clubs?select=id&limit=1" \
             -H "apikey: ${SUPABASE_ANON_KEY}")
           status=$(echo "$response" | tail -n1)
           body=$(echo "$response" | sed '$d')

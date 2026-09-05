@@ -1,17 +1,20 @@
 name: Supabase keep-alive
 
 # Los proyectos gratuitos de Supabase se pausan automáticamente tras 7 días
-# sin actividad en la API. Este workflow hace una lectura inofensiva
-# (un "select id limit 1" de solo lectura, sujeto a las mismas políticas RLS
-# que ve cualquier visitante anónimo) cada pocos días para que el proyecto
-# nunca llegue a esos 7 días de inactividad. La raíz "/rest/v1/" no sirve
-# para esto: con el sistema nuevo de claves de Supabase, ese endpoint de
-# introspección exige la clave "secret", no la "publishable/anon".
+# sin actividad en la API. Este workflow llama al endpoint de salud del
+# servicio de autenticación (no toca ninguna tabla ni necesita permisos)
+# cada pocos días para que el proyecto nunca llegue a esos 7 días de
+# inactividad.
 #
-# Requiere dos secretos del repositorio (Settings → Secrets and variables →
-# Actions → New repository secret), con los mismos valores que en .env:
-#   SUPABASE_URL       -> VITE_SUPABASE_URL
-#   SUPABASE_ANON_KEY   -> VITE_SUPABASE_ANON_KEY
+# Se descartaron otros dos endpoints al depurar esto:
+# - "/rest/v1/" (raíz OpenAPI): con el sistema nuevo de claves de Supabase
+#   exige la clave "secret", no la "publishable/anon" que usa la app.
+# - "/rest/v1/clubs": el rol "anon" no tiene GRANT SELECT sobre esa tabla
+#   (correcto: en esta app no hay nada visible sin iniciar sesión).
+#
+# Requiere un secreto del repositorio (Settings → Secrets and variables →
+# Actions → New repository secret), con el mismo valor que en .env:
+#   SUPABASE_URL -> VITE_SUPABASE_URL
 
 on:
   schedule:
@@ -25,16 +28,13 @@ jobs:
       - name: Ping Supabase
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
         run: |
-          response=$(curl -sS -w "\n%{http_code}" \
-            "${SUPABASE_URL}/rest/v1/clubs?select=id&limit=1" \
-            -H "apikey: ${SUPABASE_ANON_KEY}")
+          response=$(curl -sS -w "\n%{http_code}" "${SUPABASE_URL}/auth/v1/health")
           status=$(echo "$response" | tail -n1)
           body=$(echo "$response" | sed '$d')
           echo "HTTP $status"
           echo "Body: $body"
           if [ "$status" -lt 200 ] || [ "$status" -ge 300 ]; then
-            echo "Respuesta inesperada de Supabase, revisa los secretos SUPABASE_URL / SUPABASE_ANON_KEY"
+            echo "Respuesta inesperada de Supabase, revisa el secreto SUPABASE_URL"
             exit 1
           fi

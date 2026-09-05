@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { listAtletas } from "../lib/atletas";
+import { listAtletas, updateAtleta } from "../lib/atletas";
 import { calcularCategoria } from "../lib/categorias";
 import { useAuth } from "../context/AuthContext";
 import type { Atleta } from "../types/database";
@@ -20,6 +20,19 @@ export default function Atletas() {
       .catch((err) => setError(mensajeError(err, "No se pudo cargar el listado.")))
       .finally(() => setCargando(false));
   }, []);
+
+  async function alternarActivo(atleta: Atleta) {
+    const confirmacion = atleta.activo
+      ? `¿Dar de baja a ${atleta.nombre} ${atleta.apellidos}? Dejará de aparecer en los listados activos, pero se conserva todo su historial (resultados, pruebas físicas, comentarios).`
+      : `¿Reactivar a ${atleta.nombre} ${atleta.apellidos}?`;
+    if (!window.confirm(confirmacion)) return;
+    try {
+      await updateAtleta(atleta.id, { activo: !atleta.activo });
+      setAtletas((prev) => prev.map((a) => (a.id === atleta.id ? { ...a, activo: !a.activo } : a)));
+    } catch (err) {
+      setError(mensajeError(err, "No se pudo actualizar el atleta."));
+    }
+  }
 
   const filtrados = useMemo(() => {
     const texto = busqueda.trim().toLowerCase();
@@ -94,6 +107,7 @@ export default function Atletas() {
                 <th className="px-4 py-3">ID socio</th>
                 <th className="px-4 py-3">Categoría</th>
                 <th className="px-4 py-3">Estado</th>
+                {usuario?.rol === "admin" && <th className="px-4 py-3">Acciones</th>}
               </tr>
             </thead>
             <tbody>
@@ -120,6 +134,16 @@ export default function Atletas() {
                       )}
                     </div>
                   </td>
+                  {usuario?.rol === "admin" && (
+                    <td className="px-4 py-3">
+                      <button
+                        onClick={() => alternarActivo(a)}
+                        className="text-xs font-semibold text-navy-800 hover:text-navy-600 hover:underline"
+                      >
+                        {a.activo ? "Dar de baja" : "Reactivar"}
+                      </button>
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>

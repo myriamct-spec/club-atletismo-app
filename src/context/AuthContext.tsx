@@ -26,11 +26,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .from("usuarios")
       .select("*")
       .eq("id", userId)
-      .single();
+      .eq("activo", true)
+      .maybeSingle();
 
     if (!usuarioData) {
       setUsuario(null);
       setClub(null);
+      // Sesión sin fila de usuario (borrada) o con activo=false (dado de
+      // baja): no hay nada útil que hacer dentro de la app, así que se
+      // cierra la sesión para no dejarla "colgada" en un estado roto.
+      await supabase.auth.signOut();
       return;
     }
 

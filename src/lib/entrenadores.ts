@@ -1,12 +1,13 @@
 import { supabase } from "./supabase";
 import { supabaseAislado } from "./supabaseAdmin";
-import type { Usuario } from "../types/database";
+import type { Rol, Usuario } from "../types/database";
 
-export async function crearEntrenador(params: {
+export async function crearUsuario(params: {
   club_id: string;
   nombre: string;
   email: string;
   password: string;
+  rol: Rol;
 }): Promise<Usuario> {
   const { data, error } = await supabaseAislado.auth.signUp({
     email: params.email,
@@ -22,7 +23,7 @@ export async function crearEntrenador(params: {
       club_id: params.club_id,
       nombre: params.nombre,
       email: params.email,
-      rol: "entrenador",
+      rol: params.rol,
     })
     .select()
     .single();

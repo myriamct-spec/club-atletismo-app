@@ -30,8 +30,8 @@ export function AppLayout() {
           </NavLink>
           {usuario?.rol === "admin" && (
             <>
-              <NavLink to="/entrenadores" className={linkClasses}>
-                Entrenadores
+              <NavLink to="/usuarios" className={linkClasses}>
+                Usuarios
               </NavLink>
               <NavLink to="/grupos" className={linkClasses}>
                 Grupos

@@ -20,6 +20,7 @@ export interface Usuario {
   nombre: string;
   email: string;
   rol: Rol;
+  activo: boolean;
 }
 
 export interface Atleta {

@@ -8,19 +8,14 @@ const linkClasses = ({ isActive }: { isActive: boolean }) =>
   }`;
 
 export function AppLayout() {
-  const { usuario, club, signOut } = useAuth();
+  const { usuario, signOut } = useAuth();
 
   return (
     <div className="flex min-h-screen bg-ground">
       <aside className="flex w-60 flex-shrink-0 flex-col gap-6 bg-navy-900 p-5 text-white print:hidden">
-        <div className="flex items-center gap-3">
-          <ClubLogo size={40} />
-          <div className="leading-tight">
-            <p className="font-display text-sm tracking-wide text-white">
-              {club?.nombre ?? "Club Atletismo UCAM Cartagena"}
-            </p>
-            <p className="text-xs text-navy-100/60">Panel del entrenador</p>
-          </div>
+        <div className="flex flex-col gap-2">
+          <ClubLogo variant="full" />
+          <p className="text-center text-xs text-navy-100/60">Panel del entrenador</p>
         </div>
 
         <nav className="flex flex-1 flex-col gap-1">

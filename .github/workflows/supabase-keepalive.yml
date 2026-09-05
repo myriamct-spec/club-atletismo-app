@@ -24,11 +24,13 @@ jobs:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
         run: |
-          status=$(curl -sS -o /dev/null -w "%{http_code}" \
+          response=$(curl -sS -w "\n%{http_code}" \
             "${SUPABASE_URL}/rest/v1/" \
-            -H "apikey: ${SUPABASE_ANON_KEY}" \
-            -H "Authorization: Bearer ${SUPABASE_ANON_KEY}")
+            -H "apikey: ${SUPABASE_ANON_KEY}")
+          status=$(echo "$response" | tail -n1)
+          body=$(echo "$response" | sed '$d')
           echo "HTTP $status"
+          echo "Body: $body"
           if [ "$status" -lt 200 ] || [ "$status" -ge 300 ]; then
             echo "Respuesta inesperada de Supabase, revisa los secretos SUPABASE_URL / SUPABASE_ANON_KEY"
             exit 1

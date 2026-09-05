@@ -24,6 +24,7 @@ export async function crearUsuario(params: {
       nombre: params.nombre,
       email: params.email,
       rol: params.rol,
+      es_entrenador: params.rol === "entrenador",
     })
     .select()
     .single();

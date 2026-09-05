@@ -21,6 +21,7 @@ export interface Usuario {
   email: string;
   rol: Rol;
   activo: boolean;
+  es_entrenador: boolean;
 }
 
 export interface Atleta {

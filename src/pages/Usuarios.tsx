@@ -31,8 +31,8 @@ export default function Usuarios() {
 
   async function alternarActivo(u: Usuario) {
     const confirmacion = u.activo
-      ? `¿Dar de baja a ${u.nombre}? Perderá el acceso a la app, pero se conserva todo lo que haya registrado (comentarios, pruebas físicas, resultados).`
-      : `¿Reactivar el acceso de ${u.nombre}?`;
+      ? `¿Quitar el acceso a ${u.nombre}? Perderá el acceso a la app, pero se conserva todo lo que haya registrado (comentarios, pruebas físicas, resultados).`
+      : `¿Dar acceso a ${u.nombre}?`;
     if (!window.confirm(confirmacion)) return;
     try {
       await actualizarActivoUsuario(u.id, !u.activo);
@@ -55,8 +55,8 @@ export default function Usuarios() {
       </div>
 
       <p className="mt-1 text-sm text-navy-800/70">
-        Administradores y entrenadores del club. La asignación a grupos se gestiona desde la ficha de cada grupo, no
-        aquí.
+        Administradores y entrenadores del club. Los entrenadores que se registran desde el login aparecen aquí "Sin
+        acceso" hasta que les des acceso. La asignación a grupos se gestiona desde la ficha de cada grupo, no aquí.
       </p>
 
       {mostrarForm && club && (
@@ -89,7 +89,7 @@ export default function Usuarios() {
                   </span>
                   {!u.activo && (
                     <span className="shrink-0 rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700">
-                      Baja
+                      Sin acceso
                     </span>
                   )}
                 </div>
@@ -100,7 +100,7 @@ export default function Usuarios() {
                   onClick={() => alternarActivo(u)}
                   className="shrink-0 text-xs font-semibold text-navy-800 hover:text-navy-600 hover:underline"
                 >
-                  {u.activo ? "Dar de baja" : "Reactivar"}
+                  {u.activo ? "Quitar acceso" : "Dar acceso"}
                 </button>
               )}
             </li>

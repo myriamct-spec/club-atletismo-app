@@ -1,7 +1,7 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { listEntrenadores } from "../lib/usuarios";
+import { listPersonalAsignable } from "../lib/usuarios";
 import { listAtletas } from "../lib/atletas";
 import { calcularCategoria, CATEGORIAS_EDAD_ASIGNABLES } from "../lib/categorias";
 import {
@@ -45,7 +45,7 @@ export default function GrupoDetalle() {
         getGrupo(id),
         listEntrenadoresDeGrupo(id),
         listAtletasManualDeGrupo(id),
-        listEntrenadores(club.id),
+        listPersonalAsignable(club.id),
         listAtletas(),
       ]);
       setGrupo(g);
@@ -184,10 +184,10 @@ export default function GrupoDetalle() {
         {entrenadoresDisponibles.length > 0 && (
           <div className="mt-4 flex gap-2">
             <select value={entrenadorSeleccionado} onChange={(e) => setEntrenadorSeleccionado(e.target.value)} className="input">
-              <option value="">Seleccionar entrenador…</option>
+              <option value="">Seleccionar responsable…</option>
               {entrenadoresDisponibles.map((e) => (
                 <option key={e.id} value={e.id}>
-                  {e.nombre}
+                  {e.nombre} ({e.rol})
                 </option>
               ))}
             </select>

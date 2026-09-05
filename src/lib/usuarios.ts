@@ -1,12 +1,17 @@
 import { supabase } from "./supabase";
 import type { Rol, Usuario } from "../types/database";
 
-export async function listEntrenadores(clubId: string): Promise<Usuario[]> {
+// Cualquier usuario activo del club puede ser responsable de un grupo, no
+// solo los que tienen rol "entrenador": un admin ya puede ver y gestionar
+// cualquier atleta igual que un entrenador, así que también puede aparecer
+// como responsable asignado de un grupo. El rol solo controla el acceso al
+// panel de administración (usuarios, ajustes...), no la capacidad de
+// entrenar.
+export async function listPersonalAsignable(clubId: string): Promise<Usuario[]> {
   const { data, error } = await supabase
     .from("usuarios")
     .select("*")
     .eq("club_id", clubId)
-    .eq("rol", "entrenador")
     .eq("activo", true)
     .order("nombre");
 

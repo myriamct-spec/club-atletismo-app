@@ -1,6 +1,11 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { useAuth } from "../context/AuthContext";
-import { listUsuariosClub, actualizarActivoUsuario, actualizarRolUsuario } from "../lib/usuarios";
+import {
+  listUsuariosClub,
+  actualizarActivoUsuario,
+  actualizarRolUsuario,
+  actualizarEsEntrenadorUsuario,
+} from "../lib/usuarios";
 import { crearUsuario } from "../lib/entrenadores";
 import { mensajeError } from "../lib/errors";
 import type { Rol, Usuario } from "../types/database";
@@ -43,6 +48,15 @@ export default function Usuarios() {
     }
   }
 
+  async function alternarEsEntrenador(u: Usuario) {
+    try {
+      await actualizarEsEntrenadorUsuario(u.id, !u.es_entrenador);
+      setUsuarios((prev) => prev.map((x) => (x.id === u.id ? { ...x, es_entrenador: !x.es_entrenador } : x)));
+    } catch (err) {
+      setError(mensajeError(err, "No se pudo actualizar el usuario."));
+    }
+  }
+
   async function alternarActivo(u: Usuario) {
     const confirmacion = u.activo
       ? `¿Quitar el acceso a ${u.nombre}? Perderá el acceso a la app, pero se conserva todo lo que haya registrado (comentarios, pruebas físicas, resultados).`
@@ -70,7 +84,9 @@ export default function Usuarios() {
 
       <p className="mt-1 text-sm text-navy-800/70">
         Administradores y entrenadores del club. Los entrenadores que se registran desde el login aparecen aquí "Sin
-        acceso" hasta que les des acceso. La asignación a grupos se gestiona desde la ficha de cada grupo, no aquí.
+        acceso" hasta que les des acceso. Un admin puede además marcarse como "también entrena" para poder
+        asignársele un grupo, igual que a un entrenador. La asignación a grupos en sí se gestiona desde la ficha de
+        cada grupo, no aquí.
       </p>
 
       {mostrarForm && club && (
@@ -119,6 +135,17 @@ export default function Usuarios() {
                   )}
                 </div>
                 <p className="truncate text-navy-800/60">{u.email}</p>
+                {u.rol === "admin" && (
+                  <label className="mt-1 flex items-center gap-1.5 text-xs text-navy-800/70">
+                    <input
+                      type="checkbox"
+                      checked={u.es_entrenador}
+                      onChange={() => alternarEsEntrenador(u)}
+                      className="rounded border-navy-900/30"
+                    />
+                    También entrena (aparece como responsable asignable en grupos)
+                  </label>
+                )}
               </div>
               {u.id !== usuarioActual?.id && (
                 <button

@@ -30,9 +30,9 @@ export default function Login() {
         <img
           src="/branding/logo-horizontal.png"
           alt="Club Atletismo UCAM Cartagena"
-          className="h-10 w-auto"
+          className="mx-auto h-20 w-auto"
         />
-        <h1 className="mt-4 font-display text-3xl tracking-wide text-navy-900">Acceso de entrenadores</h1>
+        <h1 className="mt-6 text-center font-display text-3xl tracking-wide text-navy-900">Acceso de entrenadores</h1>
 
         <form onSubmit={handleSubmit} className="mt-6 space-y-4">
           <div>

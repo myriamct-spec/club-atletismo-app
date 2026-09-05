@@ -27,10 +27,12 @@ export default function Login() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-navy-900 px-4">
       <div className="w-full max-w-sm rounded-2xl bg-white p-8 shadow-lg">
-        <p className="text-xs font-semibold uppercase tracking-widest text-navy-800">
-          Club Atletismo <span className="accent-veloz">Veloz</span> Runners
-        </p>
-        <h1 className="mt-2 font-display text-3xl tracking-wide text-navy-900">Acceso de entrenadores</h1>
+        <img
+          src="/branding/logo-horizontal.png"
+          alt="Club Atletismo UCAM Cartagena"
+          className="h-10 w-auto"
+        />
+        <h1 className="mt-4 font-display text-3xl tracking-wide text-navy-900">Acceso de entrenadores</h1>
 
         <form onSubmit={handleSubmit} className="mt-6 space-y-4">
           <div>

@@ -1,0 +1,34 @@
+name: Supabase keep-alive
+
+# Los proyectos gratuitos de Supabase se pausan automáticamente tras 7 días
+# sin actividad en la API. Este workflow hace una petición inofensiva
+# (no toca ninguna tabla) cada pocos días para que el proyecto nunca llegue
+# a esos 7 días de inactividad.
+#
+# Requiere dos secretos del repositorio (Settings → Secrets and variables →
+# Actions → New repository secret), con los mismos valores que en .env:
+#   SUPABASE_URL       -> VITE_SUPABASE_URL
+#   SUPABASE_ANON_KEY   -> VITE_SUPABASE_ANON_KEY
+
+on:
+  schedule:
+    - cron: "0 6 */4 * *"
+  workflow_dispatch: {}
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Supabase
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: |
+          status=$(curl -sS -o /dev/null -w "%{http_code}" \
+            "${SUPABASE_URL}/rest/v1/" \
+            -H "apikey: ${SUPABASE_ANON_KEY}")
+          echo "HTTP $status"
+          if [ "$status" -lt 200 ] || [ "$status" -ge 300 ]; then
+            echo "Respuesta inesperada de Supabase, revisa los secretos SUPABASE_URL / SUPABASE_ANON_KEY"
+            exit 1
+          fi

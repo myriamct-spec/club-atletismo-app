@@ -9,7 +9,7 @@ export function ClubLogo({ size = 40 }: { size?: number }) {
         src={club.logo_url}
         alt={club.nombre}
         style={{ width: size, height: size }}
-        className="rounded-full object-cover"
+        className="rounded-lg bg-white object-contain p-0.5"
       />
     );
   }

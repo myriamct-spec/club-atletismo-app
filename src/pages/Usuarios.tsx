@@ -1,6 +1,6 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { useAuth } from "../context/AuthContext";
-import { listUsuariosClub, actualizarActivoUsuario } from "../lib/usuarios";
+import { listUsuariosClub, actualizarActivoUsuario, actualizarRolUsuario } from "../lib/usuarios";
 import { crearUsuario } from "../lib/entrenadores";
 import { mensajeError } from "../lib/errors";
 import type { Rol, Usuario } from "../types/database";
@@ -28,6 +28,20 @@ export default function Usuarios() {
     cargar();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [club?.id]);
+
+  async function cambiarRol(u: Usuario, rol: Rol) {
+    const confirmacion =
+      rol === "admin"
+        ? `¿Convertir a ${u.nombre} en administrador? Podrá gestionar usuarios, grupos y ajustes del club.`
+        : `¿Quitar el rol de administrador a ${u.nombre}? Pasará a ser entrenador normal.`;
+    if (!window.confirm(confirmacion)) return;
+    try {
+      await actualizarRolUsuario(u.id, rol);
+      setUsuarios((prev) => prev.map((x) => (x.id === u.id ? { ...x, rol } : x)));
+    } catch (err) {
+      setError(mensajeError(err, "No se pudo cambiar el rol."));
+    }
+  }
 
   async function alternarActivo(u: Usuario) {
     const confirmacion = u.activo
@@ -84,9 +98,20 @@ export default function Usuarios() {
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
                   <span className="truncate font-medium text-navy-900">{u.nombre}</span>
-                  <span className="shrink-0 rounded-full bg-navy-900/10 px-2 py-0.5 text-xs font-medium capitalize text-navy-800">
-                    {u.rol}
-                  </span>
+                  {u.id === usuarioActual?.id ? (
+                    <span className="shrink-0 rounded-full bg-navy-900/10 px-2 py-0.5 text-xs font-medium capitalize text-navy-800">
+                      {u.rol}
+                    </span>
+                  ) : (
+                    <select
+                      value={u.rol}
+                      onChange={(e) => cambiarRol(u, e.target.value as Rol)}
+                      className="shrink-0 rounded-full border-0 bg-navy-900/10 px-2 py-0.5 text-xs font-medium capitalize text-navy-800"
+                    >
+                      <option value="entrenador">entrenador</option>
+                      <option value="admin">admin</option>
+                    </select>
+                  )}
                   {!u.activo && (
                     <span className="shrink-0 rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700">
                       Sin acceso

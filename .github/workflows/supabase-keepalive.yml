@@ -26,7 +26,8 @@ jobs:
         run: |
           status=$(curl -sS -o /dev/null -w "%{http_code}" \
             "${SUPABASE_URL}/rest/v1/" \
-            -H "apikey: ${SUPABASE_ANON_KEY}")
+            -H "apikey: ${SUPABASE_ANON_KEY}" \
+            -H "Authorization: Bearer ${SUPABASE_ANON_KEY}")
           echo "HTTP $status"
           if [ "$status" -lt 200 ] || [ "$status" -ge 300 ]; then
             echo "Respuesta inesperada de Supabase, revisa los secretos SUPABASE_URL / SUPABASE_ANON_KEY"

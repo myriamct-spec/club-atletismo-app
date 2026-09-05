@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from "react";
-import { Navigate } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 export default function Login() {
@@ -73,6 +73,15 @@ export default function Login() {
           >
             {submitting ? "Entrando…" : "Entrar"}
           </button>
+
+          <div className="flex items-center justify-between text-sm">
+            <Link to="/olvide-password" className="text-navy-800 hover:underline">
+              He olvidado mi contraseña
+            </Link>
+            <Link to="/registro" className="font-medium text-navy-800 hover:underline">
+              Regístrate como entrenador
+            </Link>
+          </div>
         </form>
       </div>
     </div>

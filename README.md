@@ -35,6 +35,7 @@ Gestión de atletas, resultados de competición, pruebas físicas y comentarios 
 - [x] Informe de evolución del atleta: KPIs con variación, gráficas de progresión (recharts) adaptadas por familia de prueba (sprint/fondo/saltos/lanzamientos), registro de resultados en dos niveles (rápido + ampliado)
 - [x] Alta de entrenadores y gestión de grupos (por categoría de edad o de entrenamiento), sustituyendo la asignación directa entrenador↔atleta
 - [x] Gestión de usuarios (`/usuarios`, solo admin): alta de administradores y entrenadores, baja/reactivación de acceso sin perder su historial; baja/reactivación de atletas desde el listado
+- [x] Autorregistro de entrenadores desde el login (`/registro`), pendiente de aprobación en `/usuarios`; recuperación de contraseña por email (`/olvide-password`); cambio de contraseña propio (`/mi-cuenta`)
 
 ## Modelo de datos
 

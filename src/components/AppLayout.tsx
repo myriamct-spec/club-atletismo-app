@@ -46,12 +46,20 @@ export function AppLayout() {
         <div className="border-t border-white/10 pt-4 text-sm">
           <p className="font-medium">{usuario?.nombre}</p>
           <p className="text-xs capitalize text-navy-100/60">{usuario?.rol}</p>
-          <button
-            onClick={() => signOut()}
-            className="mt-3 text-xs font-semibold uppercase tracking-wide text-gold-300 hover:text-gold-500"
-          >
-            Cerrar sesión
-          </button>
+          <div className="mt-3 flex items-center gap-3">
+            <NavLink
+              to="/mi-cuenta"
+              className="text-xs font-semibold uppercase tracking-wide text-navy-100/80 hover:text-white"
+            >
+              Mi cuenta
+            </NavLink>
+            <button
+              onClick={() => signOut()}
+              className="text-xs font-semibold uppercase tracking-wide text-gold-300 hover:text-gold-500"
+            >
+              Cerrar sesión
+            </button>
+          </div>
         </div>
       </aside>
 

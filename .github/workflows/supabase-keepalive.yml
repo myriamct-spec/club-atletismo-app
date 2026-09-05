@@ -12,9 +12,13 @@ name: Supabase keep-alive
 # - "/rest/v1/clubs": el rol "anon" no tiene GRANT SELECT sobre esa tabla
 #   (correcto: en esta app no hay nada visible sin iniciar sesión).
 #
-# Requiere un secreto del repositorio (Settings → Secrets and variables →
-# Actions → New repository secret), con el mismo valor que en .env:
-#   SUPABASE_URL -> VITE_SUPABASE_URL
+# Requiere dos secretos del repositorio (Settings → Secrets and variables →
+# Actions → New repository secret), con los mismos valores que en .env:
+#   SUPABASE_URL       -> VITE_SUPABASE_URL
+#   SUPABASE_ANON_KEY  -> VITE_SUPABASE_ANON_KEY
+# (el proyecto exige la cabecera "apikey" en todas las rutas, incluida la
+# de salud de Auth, así que hace falta igualmente aunque no se consulte
+# ninguna tabla).
 
 on:
   schedule:
@@ -28,13 +32,16 @@ jobs:
       - name: Ping Supabase
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
         run: |
-          response=$(curl -sS -w "\n%{http_code}" "${SUPABASE_URL}/auth/v1/health")
+          response=$(curl -sS -w "\n%{http_code}" \
+            "${SUPABASE_URL}/auth/v1/health" \
+            -H "apikey: ${SUPABASE_ANON_KEY}")
           status=$(echo "$response" | tail -n1)
           body=$(echo "$response" | sed '$d')
           echo "HTTP $status"
           echo "Body: $body"
           if [ "$status" -lt 200 ] || [ "$status" -ge 300 ]; then
-            echo "Respuesta inesperada de Supabase, revisa el secreto SUPABASE_URL"
+            echo "Respuesta inesperada de Supabase, revisa los secretos SUPABASE_URL / SUPABASE_ANON_KEY"
             exit 1
           fi
